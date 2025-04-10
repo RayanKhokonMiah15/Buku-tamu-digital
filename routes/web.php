@@ -19,7 +19,13 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+    Route::resource('reports', ReportController::class)->only([
+        'store',
+        'edit',
+        'update',
+        'destroy'
+    ]);
 });
+
 
 require __DIR__ . '/auth.php';
