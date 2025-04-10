@@ -7,9 +7,9 @@
 
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" class="text-gray-700 dark:text-gray-300" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full bg-gray-100 dark:bg-[#2b2b2b] border border-gray-300 dark:border-[#555] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2 text-red-600 dark:text-red-400" />
+            <x-input-label for="username" class="text-gray-700 dark:text-gray-300" :value="__('Username')" />
+            <x-text-input id="username" class="block mt-1 w-full bg-gray-100 dark:bg-[#2b2b2b] border border-gray-300 dark:border-[#555] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600" type="username" name="username" :value="old('username')" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('username')" class="mt-2 text-red-600 dark:text-red-400" />
         </div>
 
         <!-- Password -->
