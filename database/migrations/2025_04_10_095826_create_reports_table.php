@@ -19,10 +19,6 @@ return new class extends Migration
             $table->string('nama_pelaku');
             $table->string('kelas_pelaku');
             $table->string('jurusan_pelaku');
-            $table->boolean('anonim')->default(true);
-            $table->string('nama_pelapor')->nullable();
-            $table->string('kelas_pelapor')->nullable();
-            $table->string('jurusan_pelapor')->nullable();
             $table->enum('peran', ['saksi', 'korban']);
             $table->enum('status', ['pending', 'ditangani'])->default('pending');
             $table->timestamps();
