@@ -17,6 +17,7 @@ class Report extends Model
         'reporter_major',
         'peran',
         'is_anonymous',
+        'status',
     ];
 
     protected $casts = [
