@@ -54,6 +54,7 @@ php artisan migrate
 
 5. Start the dev server
 ```bash
+npm install && npm run dev
 php artisan serve
 ```
 
