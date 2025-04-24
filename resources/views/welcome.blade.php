@@ -1,3 +1,6 @@
+{{-- 
+        ini buat ui di halaman awal
+--}}
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 <head>
@@ -8,6 +11,7 @@
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col">
 
+    {{-- ini buat navbar yang ada di atas, login sama register--}}
     <header class="flex justify-between items-center px-6 py-4 border-b border-gray-700">
         <h1 class="text-2xl font-semibold">🌓 My Laravel App</h1>
         @if (Route::has('login'))
@@ -24,6 +28,7 @@
         @endif
     </header>
 
+    {{-- konten utama website --}}
     <main class="flex flex-1 flex-col items-center justify-center text-center px-6">
         <h2 class="text-4xl font-bold mb-4">Welcome to Your Dark Laravel App 🌌</h2>
         <p class="text-lg text-gray-400 max-w-xl">
@@ -31,6 +36,7 @@
         </p>
     </main>
 
+    {{-- ini footer nya, kotak yang nempel di paling bawah halaman --}} 
     <footer class="text-center text-sm text-gray-500 py-4 border-t border-gray-700">
         &copy; {{ date('Y') }} Fauzy's Project. All rights reserved.
     </footer>

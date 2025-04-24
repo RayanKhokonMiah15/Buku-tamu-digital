@@ -9,6 +9,21 @@ use App\Models\Report;
 
 class AdminController extends Controller
 {
+
+    /*
+    * di fungsi index itu buat fungsi pertama yang akan dijalankan, kayak index.html aja, index.html file yang pertama
+    * ditampilin browser kalau gak specified sebuah url lain
+    *
+    * kalau funsgi show buat nampilin data.
+    *
+    * nah fungsi edit, yaa buat edit kalau ada operasi crud
+    *
+    * store buat nyimpen data setelah operasi edit dilakukan, kalau ada funsgi edit tapi gak ada fungsi store, ya sarua keneh jeung bohong.
+    *
+    * destroy buat nge hapus data.
+    *
+    * gitu aja sih sebenernya. gampang. destroy = hancurkan. harus mengerti bahasa inggris
+    */
     public function index()
     {
         $reports = Report::latest()->get(); // ambil semua laporan
