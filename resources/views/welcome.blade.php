@@ -224,9 +224,43 @@
         .image-box {
             flex: 1;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
+            gap: 2rem;
+        }
+
+        .logo-description {
+            background: rgba(55, 65, 81, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 500px;
+        }
+
+        .light-mode .logo-description {
+            background: rgba(243, 244, 246, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-description h3 {
+            font-size: 1.5rem;
+            color: #3b82f6;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .logo-description p {
+            color: #9ca3af;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .light-mode .logo-description p {
+            color: #4b5563;
         }
 
         .hero-image {
@@ -318,7 +352,7 @@
     <header>
         <div class="logo-title">
             <img src="images/logo.png" alt="Logo">
-            WhistleSecure
+            WhistleBlower
         </div>
         <nav class="navbar">
             <a href="#">Home</a>
@@ -341,29 +375,34 @@
     <!-- Main Content -->
     <main>
         <div class="main-text">
-            <h2>Welcome to WhistleSecure 🛡️</h2>
-            <p class="tagline">Empowering Truth, Protecting Integrity</p>
+            <h2>Welcome to WhistleBlower 🛡️</h2>
+            <p class="tagline">Memberdayakan Kebenaran, Melindungi Integritas.</p>
             <div class="description">
-                <p>Your trusted platform for confidential reporting and organizational transparency.</p>
+                <p>Platform terpercaya Anda untuk pelaporan rahasia dan transparansi organisasi.</p>
                 <div class="features">
                     <div class="feature-card">
                         <span class="feature-icon">🔒</span>
-                        <h3>Guaranteed Anonymity</h3>
-                        <p>State-of-the-art encryption ensuring your identity remains protected</p>
+                        <h3>Dijamin Anonimitas</h3>
+                        <p>Enkripsi canggih memastikan identitas anda tetap terlindungi</p>
                     </div>
                     <div class="feature-card">
                         <span class="feature-icon">⚖️</span>
-                        <h3>Ethical Reporting</h3>
-                        <p>Support transparency and accountability in your organization</p>
+                        <h3>Pelaporan Etis</h3>
+                        <p>Dukung transparansi dan akuntabilitas di organisasi anda</p>
                     </div>
                     <div class="feature-card">
                         <span class="feature-icon">🔍</span>
-                        <h3>Secure Investigation</h3>
-                        <p>Professional handling of reports with complete confidentiality</p>
+                        <h3>Investigasi yang Aman</h3>
+                        <p>Penanganan laporan secara profesional dengan kerahasiaan yang lengkap</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📊</span>
+                        <h3>Tracking Progress</h3>
+                        <p>Pantau status dan perkembangan laporan Anda secara real-time</p>
                     </div>
                 </div>
                 <div class="cta-section">
-                    <p class="cta-text">Make a difference today. Your voice matters.</p>
+                    <p class="cta-text">Buat perbedaan hari ini. Suara Anda penting.</p>
                     @if (Route::has('register'))
                         <a href="{{ route('register') }}" class="cta-button">Get Started</a>
                     @endif
@@ -373,11 +412,16 @@
         <div class="image-box">
             <img src="images/logo.png" alt="WhistleSecure Logo" class="hero-image">
             <div class="image-overlay"></div>
+            <div class="logo-description">
+                <h3>Apa itu WhistleBlower?</h3>
+                <p>WhistleBlower adalah platform pelaporan digital yang aman dan terpercaya, dirancang khusus untuk melindungi individu yang berani mengungkap praktik-praktik tidak etis, kecurangan, atau pelanggaran dalam organisasi.</p>
+                <p>Dengan teknologi enkripsi terkini dan sistem manajemen laporan yang canggih, kami memastikan setiap laporan ditangani dengan profesional sambil menjaga kerahasiaan total pelapor.</p>
+            </div>
         </div>
     </main>
 
     <footer>
-        &copy; {{ date('Y') }} WhistleSecure. All rights reserved.
+        &copy; {{ date('Y') }} WhistleBlower. All rights reserved.
     </footer>
 
     <!-- Pop-Up Elemen -->
