@@ -486,7 +486,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
-                setTheme('dark');   
+                setTheme('dark');
             } else if (savedTheme === 'light') {
                 setTheme('light');
             } else {

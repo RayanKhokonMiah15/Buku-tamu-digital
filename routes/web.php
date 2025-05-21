@@ -8,7 +8,7 @@ use App\Http\Controllers\AdminController;
 // 127.0.0.1:8000/ aja
 Route::get('/', function () {
     return view('welcome');
-;
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');

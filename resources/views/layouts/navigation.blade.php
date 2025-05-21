@@ -5,8 +5,7 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-100" />
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-20 w-auto">
                     </a>
                 </div>
 
@@ -34,6 +33,10 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        <x-dropdown-link :href="url('/')">
+                            {{ __('Home') }}
+                        </x-dropdown-link>
+
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>

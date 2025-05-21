@@ -17,7 +17,7 @@
     <body class="font-sans antialiased bg-[#f4f4f4] dark:bg-[#121212] text-gray-800 dark:text-gray-300 transition-colors duration-300">
 
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
-            
+
     {{-- Logo --}}
             <div>
                 <a href="/">
