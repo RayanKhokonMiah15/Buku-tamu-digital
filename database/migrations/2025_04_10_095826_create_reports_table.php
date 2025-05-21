@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('kelas_pelaku');
             $table->string('jurusan_pelaku');
             $table->enum('peran', ['saksi', 'korban']);
-            $table->enum('status', ['pending', 'ditangani'])->default('pending');
+            $table->enum('status', ['pending', 'proses', 'selesai'])->default('pending');
             $table->timestamps();
         });
     }

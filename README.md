@@ -58,9 +58,13 @@ npm install && npm run dev
 php artisan serve
 ```
 
-## 🙌 Contribution
+## 🙌 Contributor
 This project is built for educational and ethical purposes. Contributions and improvements are welcome to make it even more secure and helpful.
 you can contribute with creating a fork and pull request or submit a patch via issue.
+
+<a href="https://github.com/fauzymadani/WhistleBlower/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=fauzymadani/WhistleBlower" />
+</a>
 
 # License
 [GNU General Public License v3.0 (GPL-3.0)](https://www.gnu.org/licenses/gpl-3.0.html)
