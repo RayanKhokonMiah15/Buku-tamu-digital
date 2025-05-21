@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         /* CSS Utama */
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px; /* Add padding for fixed header */
+        }
         body {
             background-color: #1f2937;
             color: #ffffff;
@@ -78,6 +82,13 @@
             color: #000000;
         }
 
+        /* Scroll indicator for navigation links */
+        nav.navbar a.active,
+        .mobile-nav a.active {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
         #theme-toggle {
             padding: 0.4rem 0.8rem;
             background-color: #374151;
@@ -87,6 +98,9 @@
             cursor: pointer;
             transition: background-color 0.5s ease, color 0.5s ease, transform 0.3s ease;
             justify-self: end;
+            position: relative;
+            z-index: 1001;
+            pointer-events: auto;
         }
 
         #theme-toggle:hover {
@@ -293,10 +307,110 @@
             font-size: 1.5rem;
             cursor: pointer;
             padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .mobile-menu-btn:hover {
+            color: #3b82f6;
         }
 
         .mobile-nav {
-            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .mobile-nav.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        body.nav-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        .mobile-nav .nav-link {
+            color: white;
+            font-size: 1.25rem;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .mobile-nav.show .nav-link {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .mobile-nav .nav-link:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            transform: scale(1.05);
+        }
+
+        .mobile-nav.light-mode {
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+
+        .mobile-nav.light-mode .nav-link {
+            color: #1f2937;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .mobile-nav.light-mode .nav-link:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .close-menu {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .close-menu:hover {
+            transform: rotate(90deg);
+            color: #3b82f6;
+        }
+
+        .light-mode .close-menu {
+            color: #1f2937;
         }
 
         @media (max-width: 768px) {
@@ -324,63 +438,138 @@
             }
 
             .mobile-nav {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(17, 24, 39, 0.95);
-                backdrop-filter: blur(8px);
-                z-index: 1000;
-            }
-
-            .mobile-nav.show {
                 display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 2rem;
-                padding: 2rem;
+                padding: 6rem 2rem;
             }
 
-            .mobile-nav a {
-                color: #fff;
-                text-decoration: none;
-                font-size: 1.2rem;
-                font-weight: 500;
-                transition: color 0.3s ease;
-            }
-
-            .mobile-nav a:hover {
-                color: #3b82f6;
+            .mobile-nav .nav-link {
+                margin: 0.5rem 0;
+                transition-delay: calc(var(--i) * 0.1s);
             }
 
             .close-menu {
-                position: absolute;
                 top: 1rem;
                 right: 1rem;
-                background: none;
-                border: none;
-                color: #fff;
-                font-size: 1.5rem;
-                cursor: pointer;
             }
 
-            .light-mode .mobile-nav {
-                background: rgba(255, 255, 255, 0.95);
+            main {
+                padding: 2rem 1rem;
+                flex-direction: column;
+            }
+
+            .main-text {
+                margin-right: 0;
+                margin-bottom: 2rem;
+                max-width: 100%;
+            }
+
+            .main-text h2 {
+                font-size: 2rem;
+                text-align: center;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+                text-align: center;
+            }
+
+            .description {
+                padding: 1.5rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .feature-card {
+                padding: 1.25rem;
+            }
+
+            .cta-section {
+                margin-top: 1.5rem;
+            }
+
+            .cta-text {
+                font-size: 1.1rem;
+            }
+
+            .cta-button {
+                width: 100%;
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .image-box {
+                width: 100%;
+                gap: 1.5rem;
+            }
+
+            .hero-image {
+                max-width: 280px;
+                margin: 0 auto;
+            }
+
+            .logo-description {
+                padding: 1.5rem;
+                margin: 0 1rem;
+                text-align: center;
+            }
+
+            .logo-description h3 {
+                font-size: 1.3rem;
+            }
+
+            .logo-description p {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            /* Improve mobile nav spacing */
+            .mobile-nav {
+                padding: 4rem 2rem;
+            }
+
+            .mobile-nav a {
+                padding: 0.75rem 1.5rem;
+                width: 100%;
+                text-align: center;
+                border-radius: 0.5rem;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .mobile-nav a:hover {
+                background: rgba(255, 255, 255, 0.2);
             }
 
             .light-mode .mobile-nav a {
-                color: #111827;
+                background: rgba(0, 0, 0, 0.05);
             }
 
             .light-mode .mobile-nav a:hover {
-                color: #3b82f6;
+                background: rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-text h2 {
+                font-size: 1.75rem;
             }
 
-            .light-mode .close-menu {
-                color: #111827;
+            .tagline {
+                font-size: 1.1rem;
+            }
+
+            .feature-card {
+                padding: 1rem;
+            }
+
+            .hero-image {
+                max-width: 240px;
+            }
+
+            .logo-description {
+                padding: 1.25rem;
             }
         }
 
@@ -429,6 +618,37 @@
             visibility: hidden;
             transform: translate(-50%, -50%) scale(0.9);
         }
+
+        #theme-toggle {
+            z-index: 1001;
+            position: relative;
+        }
+
+        .mobile-menu-btn {
+            z-index: 1001;
+            position: relative;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .mobile-nav.show {
+            display: flex;
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 <body>
@@ -439,9 +659,8 @@
             WhistleBlower
         </div>
         <nav class="navbar">
-            <a href="{{ url('/') }}">Home</a>
-            <a href="#">About</a>
-            <a href="#">Contact</a>
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
             @if (Route::has('login'))
                 @auth
                     <a href="{{ route('dashboard') }}">Dashboard</a>
@@ -460,16 +679,15 @@
     <!-- Mobile Navigation -->
     <nav class="mobile-nav" id="mobile-nav">
         <button class="close-menu" id="close-menu">×</button>
-        <a href="{{ url('/') }}">Home</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
+        <a href="#home" class="nav-link" onclick="closeMenu()">Home</a>
+        <a href="#about" class="nav-link" onclick="closeMenu()">About</a>
         @if (Route::has('login'))
             @auth
-                <a href="{{ route('dashboard') }}">Dashboard</a>
+                <a href="{{ route('dashboard') }}" class="nav-link">Dashboard</a>
             @else
-                <a href="{{ route('login') }}">Login</a>
+                <a href="{{ route('login') }}" class="nav-link">Login</a>
                 @if (Route::has('register'))
-                    <a href="{{ route('register') }}">Register</a>
+                    <a href="{{ route('register') }}" class="nav-link">Register</a>
                 @endif
             @endauth
         @endif
@@ -477,7 +695,7 @@
 
     <!-- Main Content -->
     <main>
-        <div class="main-text">
+        <div id="home" class="main-text">
             <h2>Welcome to WhistleBlower 🛡️</h2>
             <p class="tagline">Memberdayakan Kebenaran, Melindungi Integritas.</p>
             <div class="description">
@@ -512,7 +730,7 @@
                 </div>
             </div>
         </div>
-        <div class="image-box">
+        <div id="about" class="image-box">
             <img src="images/logo.png" alt="WhistleSecure Logo" class="hero-image">
             <div class="image-overlay"></div>
             <div class="logo-description">
@@ -535,93 +753,117 @@
     <audio id="light-mode-sound" src="sounds/light-mode.mp3"></audio>
 
     <script>
-        const toggleBtn = document.getElementById('theme-toggle');
-        const body = document.body;
-        const popup = document.getElementById('popup');
-        const header = document.querySelector('header');
-        const navbar = document.querySelector('nav.navbar');
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const mobileNav = document.getElementById('mobile-nav');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const closeMenuBtn = document.getElementById('close-menu');
+            const body = document.body;
 
-        // Audio elements
-        const darkModeSound = document.getElementById('dark-mode-sound');
-        const lightModeSound = document.getElementById('light-mode-sound');
+            // Initialize theme from localStorage
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            setTheme(currentTheme);
 
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                body.classList.remove('light-mode');
-                header.classList.remove('light-mode');
-                navbar.classList.remove('light-mode');
-                toggleBtn.textContent = '🌙';
-                localStorage.setItem('theme', 'dark');
-                showPopup("Selamat datang di kegelapan");
-                playSound(darkModeSound); // Mainkan suara dark mode
-            } else {
-                body.classList.add('light-mode');
-                header.classList.add('light-mode');
-                navbar.classList.add('light-mode');
-                toggleBtn.textContent = '🌞';
-                localStorage.setItem('theme', 'light');
-                showPopup("Selamat datang di pencerahan");
-                playSound(lightModeSound); // Mainkan suara light mode
+            function setTheme(theme) {
+                if (theme === 'light') {
+                    body.classList.add('light-mode');
+                    themeToggle.classList.add('light-mode');
+                    mobileNav.classList.add('light-mode');
+                    themeToggle.textContent = '🌙';
+                } else {
+                    body.classList.remove('light-mode');
+                    themeToggle.classList.remove('light-mode');
+                    mobileNav.classList.remove('light-mode');
+                    themeToggle.textContent = '☀️';
+                }
+                localStorage.setItem('theme', theme);
             }
-        }
 
-        // Fungsi untuk menampilkan pop-up
-        function showPopup(message) {
-            popup.textContent = message;
-            popup.classList.add('visible');
+            // Theme toggle
+            themeToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const newTheme = body.classList.contains('light-mode') ? 'dark' : 'light';
+                setTheme(newTheme);
+            });
 
-            // Hilangkan pop-up setelah 2 detik
-            setTimeout(() => {
-                popup.classList.remove('visible');
-                popup.classList.add('hidden');
-                setTimeout(() => {
-                    popup.classList.remove('hidden');
-                }, 500); // Sinkronkan dengan durasi transisi
-            }, 2000);
-        }
-
-        // Fungsi untuk memainkan suara
-        function playSound(audioElement) {
-            audioElement.currentTime = 0; // Mulai ulang suara jika sudah dimainkan
-            audioElement.play();
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                setTheme('dark');
-            } else if (savedTheme === 'light') {
-                setTheme('light');
-            } else {
-                setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            }
-        });
-
-        toggleBtn.addEventListener('click', () => {
-            const isLight = body.classList.contains('light-mode');
-            setTheme(isLight ? 'dark' : 'light');
-        });
-
-        // Mobile Navigation
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileNav = document.getElementById('mobile-nav');
-        const closeMenu = document.getElementById('close-menu');
-
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileNav.classList.add('show');
-        });
-
-        closeMenu.addEventListener('click', () => {
-            mobileNav.classList.remove('show');
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (mobileNav.classList.contains('show') &&
-                !mobileNav.contains(e.target) &&
-                e.target !== mobileMenuBtn) {
+            // Close menu function
+            function closeMenu() {
                 mobileNav.classList.remove('show');
+                body.classList.remove('nav-open');
             }
+
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileNav.classList.add('show');
+                body.classList.add('nav-open');
+
+                // Add transition delays to nav links
+                document.querySelectorAll('.mobile-nav .nav-link').forEach((link, index) => {
+                    link.style.setProperty('--i', index);
+                });
+            });
+
+            // Close menu button
+            closeMenuBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeMenu();
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (mobileNav.classList.contains('show') &&
+                    !mobileNav.contains(e.target) &&
+                    !mobileMenuBtn.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+
+            // Handle navigation links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    if (targetId.startsWith('#')) {
+                        const targetElement = document.getElementById(targetId.substring(1));
+                        if (targetElement) {
+                            closeMenu();
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    } else {
+                        window.location.href = targetId;
+                    }
+                });
+            });
+
+            // Prevent scrolling when mobile menu is open
+            document.body.addEventListener('touchmove', (e) => {
+                if (body.classList.contains('nav-open')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Scroll spy for navigation
+            window.addEventListener('scroll', () => {
+                const scrollPosition = window.scrollY;
+                document.querySelectorAll('section').forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionBottom = sectionTop + section.offsetHeight;
+                    const id = section.getAttribute('id');
+
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            });
         });
     </script>
 </body>
