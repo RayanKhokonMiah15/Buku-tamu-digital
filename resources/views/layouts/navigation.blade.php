@@ -5,12 +5,14 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-20 w-auto">
+                    <a href="{{ url('/') }}" class="flex items-center">
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-6 w-auto">
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="flex space-x-8 sm:-my-px sm:ms-10">
+
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
@@ -68,9 +70,10 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-white dark:bg-gray-800 w-full absolute z-50">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="block px-4 py-2 text-base">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
         </div>
@@ -82,8 +85,12 @@
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
             </div>
 
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
+            <div class="mt-3 space-y-1 px-2">
+                <x-responsive-nav-link :href="url('/')" :active="request()->is('/')" class="block w-full px-4 py-2 text-base">
+                    {{ __('Home') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('profile.edit')" class="block w-full px-4 py-2 text-base">
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
