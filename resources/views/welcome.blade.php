@@ -284,19 +284,103 @@
             z-index: 0;
         }
 
-        @media (max-width: 1024px) {
-            main {
+        /* Mobile Navigation Styles */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .mobile-nav {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                grid-template-columns: auto 1fr auto;
+                padding: 1rem;
+            }
+
+            .logo-title {
+                font-size: 1.2rem;
+            }
+
+            .logo-title img {
+                width: 40px;
+                height: 40px;
+            }
+
+            nav.navbar {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+                order: 3;
+            }
+
+            .mobile-nav {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(17, 24, 39, 0.95);
+                backdrop-filter: blur(8px);
+                z-index: 1000;
+            }
+
+            .mobile-nav.show {
+                display: flex;
                 flex-direction: column;
-                text-align: center;
+                align-items: center;
+                justify-content: center;
+                gap: 2rem;
+                padding: 2rem;
             }
 
-            .main-text {
-                margin-right: 0;
-                margin-bottom: 3rem;
+            .mobile-nav a {
+                color: #fff;
+                text-decoration: none;
+                font-size: 1.2rem;
+                font-weight: 500;
+                transition: color 0.3s ease;
             }
 
-            .features {
-                grid-template-columns: 1fr;
+            .mobile-nav a:hover {
+                color: #3b82f6;
+            }
+
+            .close-menu {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
+            .light-mode .mobile-nav {
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .light-mode .mobile-nav a {
+                color: #111827;
+            }
+
+            .light-mode .mobile-nav a:hover {
+                color: #3b82f6;
+            }
+
+            .light-mode .close-menu {
+                color: #111827;
             }
         }
 
@@ -351,16 +435,16 @@
     <!-- Navbar -->
     <header>
         <div class="logo-title">
-            <img src="images/logo.png" alt="Logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo">
             WhistleBlower
         </div>
         <nav class="navbar">
-            <a href="#">Home</a>
+            <a href="{{ url('/') }}">Home</a>
             <a href="#">About</a>
             <a href="#">Contact</a>
             @if (Route::has('login'))
                 @auth
-                    <a href="{{ url('/dashboard') }}">Dashboard</a>
+                    <a href="{{ route('dashboard') }}">Dashboard</a>
                 @else
                     <a href="{{ route('login') }}">Login</a>
                     @if (Route::has('register'))
@@ -370,7 +454,26 @@
             @endif
         </nav>
         <button id="theme-toggle">🌙</button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
     </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav" id="mobile-nav">
+        <button class="close-menu" id="close-menu">×</button>
+        <a href="{{ url('/') }}">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        @if (Route::has('login'))
+            @auth
+                <a href="{{ route('dashboard') }}">Dashboard</a>
+            @else
+                <a href="{{ route('login') }}">Login</a>
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}">Register</a>
+                @endif
+            @endauth
+        @endif
+    </nav>
 
     <!-- Main Content -->
     <main>
@@ -497,6 +600,28 @@
         toggleBtn.addEventListener('click', () => {
             const isLight = body.classList.contains('light-mode');
             setTheme(isLight ? 'dark' : 'light');
+        });
+
+        // Mobile Navigation
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileNav = document.getElementById('mobile-nav');
+        const closeMenu = document.getElementById('close-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileNav.classList.add('show');
+        });
+
+        closeMenu.addEventListener('click', () => {
+            mobileNav.classList.remove('show');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (mobileNav.classList.contains('show') &&
+                !mobileNav.contains(e.target) &&
+                e.target !== mobileMenuBtn) {
+                mobileNav.classList.remove('show');
+            }
         });
     </script>
 </body>
