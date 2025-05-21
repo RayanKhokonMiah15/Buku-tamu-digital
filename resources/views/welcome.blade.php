@@ -108,8 +108,162 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 2rem;
+            padding: 4rem 2rem;
             flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-text {
+            flex: 1;
+            max-width: 600px;
+            margin-right: 2rem;
+        }
+
+        .main-text h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #3b82f6, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from {
+                filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.5));
+            }
+            to {
+                filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.8));
+            }
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: #9ca3af;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .description {
+            background: rgba(55, 65, 81, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .light-mode .description {
+            background: rgba(243, 244, 246, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 0.75rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .light-mode .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #3b82f6;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .cta-text {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #9ca3af;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #3b82f6, #2563eb);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .image-box {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .hero-image {
+            max-width: 400px;
+            height: auto;
+            border-radius: 2rem;
+            transition: transform 0.5s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0) 70%);
+            filter: blur(40px);
+            z-index: 0;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .main-text {
+                margin-right: 0;
+                margin-bottom: 3rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
         }
 
         footer {
@@ -188,10 +342,37 @@
     <main>
         <div class="main-text">
             <h2>Welcome to WhistleSecure 🛡️</h2>
-            <p>A secure and confidential platform for reporting misconduct anonymously.</p>
+            <p class="tagline">Empowering Truth, Protecting Integrity</p>
+            <div class="description">
+                <p>Your trusted platform for confidential reporting and organizational transparency.</p>
+                <div class="features">
+                    <div class="feature-card">
+                        <span class="feature-icon">🔒</span>
+                        <h3>Guaranteed Anonymity</h3>
+                        <p>State-of-the-art encryption ensuring your identity remains protected</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">⚖️</span>
+                        <h3>Ethical Reporting</h3>
+                        <p>Support transparency and accountability in your organization</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔍</span>
+                        <h3>Secure Investigation</h3>
+                        <p>Professional handling of reports with complete confidentiality</p>
+                    </div>
+                </div>
+                <div class="cta-section">
+                    <p class="cta-text">Make a difference today. Your voice matters.</p>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="cta-button">Get Started</a>
+                    @endif
+                </div>
+            </div>
         </div>
         <div class="image-box">
-            <img src="images/logo.png" alt="Image Box">
+            <img src="images/logo.png" alt="WhistleSecure Logo" class="hero-image">
+            <div class="image-overlay"></div>
         </div>
     </main>
 
