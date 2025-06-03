@@ -111,6 +111,10 @@
             <a href="{{ route('admin.dashboard') }}">
                 <i class="fas fa-home"></i> Dashboard
             </a>
+
+            <a href="{{route('guru.index')}}">
+                <i class="fas fa-home"></i>Daftar Guru
+            </a>
         </div>
 
         <!-- Tombol logout -->

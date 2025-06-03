@@ -1,11 +1,10 @@
 <?php
-
-namespace App\Http\Controllers;
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Report;
+use Illuminate\Support\Facades\Log;
+
 
 class AdminController extends Controller
 {
@@ -32,7 +31,7 @@ class AdminController extends Controller
 
     public function updateStatus(Request $request, Report $report)
     {
-        \Log::info('Updating status for report ' . $report->id . ' to ' . $request->status);
+        Log::info('Updating status for report ' . $report->id . ' to ' . $request->status);
 
         $report->update([
             'status' => $request->status,

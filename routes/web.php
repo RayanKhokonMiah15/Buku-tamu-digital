@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\GuruController;
 
 // 127.0.0.1:8000/ aja
 Route::get('/', function () {
@@ -42,6 +43,14 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/reports/{report}/edit', [AdminController::class, 'edit'])->name('admin.reports.edit');
     Route::put('/admin/reports/{report}', [AdminController::class, 'updateStatus'])->name('admin.reports.update');
     Route::delete('/admin/reports/{report}', [AdminController::class, 'destroy'])->name('admin.reports.destroy');
+
+    // CRUD Guru
+    Route::get('/admin/guru', [GuruController::class, 'index'])->name('guru.index');
+    Route::get('/admin/guru/create', [GuruController::class, 'create'])->name('guru.create');
+    Route::post('/admin/guru', [GuruController::class, 'store'])->name('guru.store');
+    Route::get('/admin/guru/{id}/edit', [GuruController::class, 'edit'])->name('guru.edit');
+    Route::put('/admin/guru/{id}', [GuruController::class, 'update'])->name('guru.update');
+    Route::delete('/admin/guru/{id}', [GuruController::class, 'destroy'])->name('guru.destroy');
 });
 
 require __DIR__ . '/auth.php';
