@@ -56,39 +56,24 @@
         </label>
         <input type="file" name="image" id="image" accept="image/*" class="hidden" onchange="showPreview(this)">
 
-        <div id="imagePreview" class="hidden flex items-center space-x-2">
-            <img src="#" alt="Preview" class="h-20 w-20 object-cover rounded border border-gray-300 dark:border-gray-600">
-            <button type="button" onclick="removeImage()" class="text-red-500 hover:text-red-600" aria-label="Hapus gambar">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
+        <div id="imagePreview" class="hidden">
+            <div class="relative group max-w-2xl mx-auto">
+                <div class="bg-gray-50 dark:bg-[#262626] rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                    <img src="#" alt="Preview" class="max-h-[500px] w-full object-contain rounded-lg">
+                    <button type="button" onclick="removeImage()"
+                        class="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200"
+                        aria-label="Hapus gambar">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        *Ukuran maksimal 5MB, format yang didukung: JPG, PNG, GIF
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
-<script>
-    function showPreview(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('imagePreview');
-                const img = preview.querySelector('img');
-                img.src = e.target.result;
-                preview.classList.remove('hidden');
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function removeImage() {
-        const inputFile = document.getElementById('image');
-        const preview = document.getElementById('imagePreview');
-        inputFile.value = '';
-        preview.classList.add('hidden');
-        preview.querySelector('img').src = '#';
-    }
-</script>
 
                         </div>
 
@@ -98,18 +83,27 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="nama_pelaku" class="block font-medium">Nama Pelaku</label>
-                            <input type="text" name="nama_pelaku" id="nama_pelaku" class="{{ $inputStyle }}" required>
-                        </div>
+                            <label class="inline-flex items-center mb-2">
+                                <input type="checkbox" name="unknown_perpetrator" id="unknown_perpetrator" value="1" onchange="togglePerpFields()" class="form-checkbox">
+                                <span class="ml-2">Tidak mengetahui pelaku</span>
+                            </label>
 
-                        <div class="mb-4">
-                            <label for="kelas_pelaku" class="block font-medium">Kelas Pelaku</label>
-                            <input type="text" name="kelas_pelaku" id="kelas_pelaku" class="{{ $inputStyle }}" required>
-                        </div>
+                            <div id="perp-fields">
+                                <div class="mb-4">
+                                    <label for="nama_pelaku" class="block font-medium">Nama Pelaku</label>
+                                    <input type="text" name="nama_pelaku" id="nama_pelaku" class="{{ $inputStyle }}" required>
+                                </div>
 
-                        <div class="mb-4">
-                            <label for="jurusan_pelaku" class="block font-medium">Jurusan Pelaku</label>
-                            <input type="text" name="jurusan_pelaku" id="jurusan_pelaku" class="{{ $inputStyle }}" required>
+                                <div class="mb-4">
+                                    <label for="kelas_pelaku" class="block font-medium">Kelas Pelaku</label>
+                                    <input type="text" name="kelas_pelaku" id="kelas_pelaku" class="{{ $inputStyle }}" required>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="jurusan_pelaku" class="block font-medium">Jurusan Pelaku</label>
+                                    <input type="text" name="jurusan_pelaku" id="jurusan_pelaku" class="{{ $inputStyle }}" required>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-4">
@@ -191,14 +185,14 @@
 
                                     @if($report->image_path)
                                         <div class="mt-4">
-                                            <div class="relative group cursor-pointer">
-                                                <div class="aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700">
-                                                    <img src="{{ asset('storage/' . $report->image_path) }}"
-                                                         alt="Bukti laporan"
-                                                         class="w-full h-full object-contain hover:scale-105 transition-transform duration-500"
-                                                         onclick="window.open(this.src, '_blank')"
-                                                         loading="lazy"
-                                                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23999999\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cline x1=\'18\' y1=\'6\' x2=\'6\' y2=\'18\'%3E%3C/line%3E%3Cline x1=\'6\' y1=\'6\' x2=\'18\' y2=\'18\'%3E%3C/line%3E%3C/svg%3E'; this.classList.add('p-8');">
+                                            <div class="relative group cursor-pointer">                                <div class="relative h-[500px] rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700">
+                                    <img src="{{ asset('storage/' . $report->image_path) }}"
+                                         alt="Bukti laporan"
+                                         class="absolute inset-0 w-full h-full object-contain hover:scale-[1.02] transition-transform duration-500"
+                                         style="object-position: center;"
+                                         onclick="openImageViewer(this.src)"
+                                         loading="lazy"
+                                         onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23999999\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cline x1=\'18\' y1=\'6\' x2=\'6\' y2=\'18\'%3E%3C/line%3E%3Cline x1=\'6\' y1=\'6\' x2=\'18\' y2=\'18\'%3E%3C/line%3E%3C/svg%3E'; this.classList.add('p-8');">
                                                 </div>
                                                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex items-center justify-center">
                                                     <span class="text-white text-sm font-medium tracking-wide flex items-center">
@@ -299,6 +293,109 @@
             const checkbox = document.getElementById('is_anonymous');
             const reporterIdentity = document.getElementById('reporter-identity');
             reporterIdentity.style.display = checkbox.checked ? 'none' : 'grid';
+        }
+
+        function togglePerpFields() {
+            const checkbox = document.getElementById('unknown_perpetrator');
+            const perpFields = document.getElementById('perp-fields');
+            const inputs = perpFields.querySelectorAll('input[type="text"]');
+
+            perpFields.style.display = checkbox.checked ? 'none' : 'block';
+
+            inputs.forEach(input => {
+                if(checkbox.checked) {
+                    input.value = 'Tidak Diketahui';
+                    input.setAttribute('readonly', true);
+                } else {
+                    input.value = '';
+                    input.removeAttribute('readonly');
+                }
+            });
+        }
+
+        function showPreview(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
+                if (file.size > maxSize) {
+                    alert('Ukuran file terlalu besar. Maksimal 5MB.');
+                    input.value = '';
+                    return;
+                }
+
+                if (!validTypes.includes(file.type)) {
+                    alert('Format file tidak didukung. Gunakan JPG, PNG, atau GIF.');
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.querySelector('#imagePreview img');
+                    img.src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+
+                    // Check image dimensions after loading
+                    img.onload = function() {
+                        if (this.naturalWidth < 100 || this.naturalHeight < 100) {
+                            alert('Resolusi gambar terlalu kecil. Minimal 100x100 piksel.');
+                            input.value = '';
+                            document.getElementById('imagePreview').classList.add('hidden');
+                        }
+                    };
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            document.getElementById('image').value = '';
+            document.getElementById('imagePreview').classList.add('hidden');
+        }
+
+        function openImageViewer(src) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4';
+            modal.innerHTML = `
+                <div class="relative w-full h-full flex items-center justify-center p-4">
+                    <button class="fixed top-4 right-4 z-50 p-2 text-white hover:text-gray-300 transition-colors duration-200 bg-black/50 rounded-full" onclick="this.parentElement.parentElement.remove()">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                    <div class="w-full h-full relative overflow-auto flex items-center justify-center">
+                        <img src="${src}"
+                            class="max-w-[95vw] max-h-[95vh] w-auto h-auto object-contain"
+                            style="transform-origin: center; transition: transform 0.3s ease;"
+                            alt="Full size image">
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const img = modal.querySelector('img');
+            let scale = 1;
+
+            // Handle zoom with mouse wheel
+            modal.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY;
+                if (delta < 0) {
+                    // Zoom in
+                    scale = Math.min(scale + 0.1, 3);
+                } else {
+                    // Zoom out
+                    scale = Math.max(scale - 0.1, 0.5);
+                }
+                img.style.transform = `scale(${scale})`;
+            });
+
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
         }
     </script>
 </x-app-layout>

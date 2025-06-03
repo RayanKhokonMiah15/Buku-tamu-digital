@@ -6,48 +6,51 @@ use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\ReportRequest;
 
 // Controller buat handle laporan (buat, edit, update, hapus)
 class ReportController extends Controller
 {
     // Fungsi buat nyimpan laporan baru dari user
-    public function store(Request $request)
+    public function store(ReportRequest $request)
     {
-        // Validasi input dari form laporan
-        $validated = $request->validate([
-            'judul' => 'required|string|max:255',
-            'isi_laporan' => 'required|string',
-            'nama_pelaku' => 'required|string|max:255',
-            'kelas_pelaku' => 'required|string|max:255',
-            'jurusan_pelaku' => 'required|string|max:255',
-            'is_anonymous' => 'required|boolean',
-            'reporter_name' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi file gambar
-            'reporter_class' => 'nullable|string|max:255',
-            'reporter_major' => 'nullable|string|max:255',
-            'peran' => 'required|in:saksi,korban', // harus pilih saksi atau korban
-        ]);
+        // Get validated data
+        $validated = $request->validated();
 
         // Handle upload gambar jika ada
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
+            try {
+                $image = $request->file('image');
+                $imageName = time() . '_' . $image->getClientOriginalName();
 
-            // Ensure directory exists
-            Storage::makeDirectory('public/images');
+                // Ensure directory exists
+                Storage::makeDirectory('public/images');
 
-            // Store the image
-            $image->storeAs('public/images', $imageName);
-            $validated['image_path'] = 'images/' . $imageName;
+                // Store the image
+                $image->storeAs('public/images', $imageName);
+                $validated['image_path'] = 'images/' . $imageName;
+            } catch (\Exception $e) {
+                return back()->withErrors(['image' => 'Gagal mengunggah gambar. Silakan coba lagi.']);
+            }
+        }
+
+        // Handle unknown perpetrator
+        if ($request->has('unknown_perpetrator') && $request->unknown_perpetrator) {
+            $validated['nama_pelaku'] = 'Tidak Diketahui';
+            $validated['kelas_pelaku'] = 'Tidak Diketahui';
+            $validated['jurusan_pelaku'] = 'Tidak Diketahui';
         }
 
         // Buat objek laporan baru
-        $report = new Report($validated);
-        $report->user_id = Auth::id();
-        $report->save();
+        try {
+            $report = new Report($validated);
+            $report->user_id = Auth::id();
+            $report->save();
 
-        // Balik ke halaman sebelumnya dengan notifikasi sukses
-        return redirect()->back()->with('success', 'Laporan berhasil dikirim.');
+            return redirect()->back()->with('success', 'Laporan berhasil dikirim.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menyimpan laporan. Silakan coba lagi.']);
+        }
     }
 
     // Fungsi buat nampilin form edit laporan
@@ -58,56 +61,50 @@ class ReportController extends Controller
     }
 
     // Fungsi buat update laporan setelah diedit
-    public function update(Request $request, Report $report)
+    public function update(ReportRequest $request, Report $report)
     {
-        // Validasi data
-        $validated = $request->validate([
-            'judul' => 'required|string|max:255',
-            'isi_laporan' => 'required|string',
-            'nama_pelaku' => 'nullable|string|max:255',
-            'kelas_pelaku' => 'nullable|string|max:255',
-            'jurusan_pelaku' => 'nullable|string|max:255',
-            'peran' => 'required|in:saksi,korban',
-            'is_anonymous' => 'nullable|boolean',
-            'reporter_name' => 'nullable|string|max:255',
-            'reporter_class' => 'nullable|string|max:255',
-            'reporter_major' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        // Get validated data
+        $validated = $request->validated();
 
-        // Handle image update
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($report->image_path) {
-                Storage::delete('public/' . $report->image_path);
+        try {
+            // Handle image update
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($report->image_path) {
+                    Storage::delete('public/' . $report->image_path);
+                }
+
+                // Store new image
+                $image = $request->file('image');
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $image->storeAs('public/images', $imageName);
+                $validated['image_path'] = 'images/' . $imageName;
             }
 
-            // Ensure directory exists
-            Storage::makeDirectory('public/images');
+            // Handle unknown perpetrator
+            if ($request->has('unknown_perpetrator') && $request->unknown_perpetrator) {
+                $validated['nama_pelaku'] = 'Tidak Diketahui';
+                $validated['kelas_pelaku'] = 'Tidak Diketahui';
+                $validated['jurusan_pelaku'] = 'Tidak Diketahui';
+            }
 
-            // Store new image
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/images', $imageName);
-            $validated['image_path'] = 'images/' . $imageName;
+            // Handle anonymous report
+            if ($request->has('is_anonymous')) {
+                $validated['reporter_name'] = null;
+                $validated['reporter_class'] = null;
+                $validated['reporter_major'] = null;
+                $validated['is_anonymous'] = true;
+            } else {
+                $validated['is_anonymous'] = false;
+            }
+
+            // Update report
+            $report->update($validated);
+
+            return redirect()->route('dashboard')->with('success', 'Laporan berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal memperbarui laporan. Silakan coba lagi.']);
         }
-
-        // Kalau user pilih "anonim", hapus info pelapor & set anonim true
-        if ($request->has('is_anonymous')) {
-            $validated['reporter_name'] = null;
-            $validated['reporter_class'] = null;
-            $validated['reporter_major'] = null;
-            $validated['is_anonymous'] = true;
-        } else {
-            // Kalau nggak, tandain sebagai non-anonim
-            $validated['is_anonymous'] = false;
-        }
-
-        // Update data laporan di database
-        $report->update($validated);
-
-        // Arahkan ke dashboard dengan notifikasi sukses
-        return redirect()->route('dashboard')->with('success', 'Laporan berhasil diperbarui!');
     }
 
     // Fungsi buat hapus laporan

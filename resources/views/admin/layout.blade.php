@@ -4,68 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-
-    <!-- Import Bootstrap dan Font Awesome untuk styling dan ikon -->
+    <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* Body styling untuk tampilan full height */
+        /* Admin Layout Styles */
         body {
             display: flex;
             min-height: 100vh;
             margin: 0;
             background-color: #f8f9fa;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
         }
 
-        /* Sidebar styling */
         .sidebar {
             width: 250px;
-            background: #2c3e50;
-            color: #ecf0f1;
+            background: #1a1a1a;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Biar tombol logout di bagian bawah */
+            justify-content: space-between;
         }
 
         .sidebar h4 {
-            padding: 20px;
+            padding: 1.25rem;
             text-align: center;
-            background: #34495e;
+            background: #2d2d2d;
             margin: 0;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
         }
 
         .sidebar a {
-            color: #ecf0f1;
+            color: #ffffff;
             display: flex;
             align-items: center;
-            padding: 15px 20px;
+            padding: 0.875rem 1.25rem;
             text-decoration: none;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            font-size: 0.9375rem;
         }
 
         .sidebar a:hover {
-            background: #1abc9c;
+            background: rgba(255, 255, 255, 0.1);
+            padding-left: 1.5rem;
         }
 
         .sidebar a i {
-            margin-right: 10px;
+            margin-right: 0.75rem;
+            font-size: 1rem;
+            width: 1.25rem;
+            text-align: center;
         }
 
         .sidebar form {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            padding: 1.25rem;
+            margin-top: auto;
         }
 
         .sidebar button {
-            background: #e74c3c;
+            background: #dc3545;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.375rem;
             color: white;
-            font-weight: bold;
+            font-weight: 500;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
             transition: background 0.3s;
             width: 100%; /* Tombol penuh di dalam sidebar */
         }

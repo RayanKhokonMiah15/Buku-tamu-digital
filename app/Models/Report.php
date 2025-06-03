@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 // Model buat tabel "reports" di database
 class Report extends Model
@@ -32,5 +34,44 @@ class Report extends Model
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
+    }
+
+    /**
+     * Validation rules for the report image.
+     *
+     * @return array
+     */
+    public static function imageValidationRules()
+    {
+        return [
+            'image' => [
+                'nullable',                    // Field is optional
+                'image',                      // Must be an image file
+                'mimes:jpeg,png,gif',         // Allowed formats
+                'max:5120',                   // Max 5MB (5120 KB)
+                'dimensions:min_width=100,min_height=100'  // Minimum dimensions
+            ]
+        ];
+    }
+
+    /**
+     * Validate an image file for this report.
+     *
+     * @param mixed $image The uploaded image file
+     * @throws ValidationException
+     * @return bool
+     */
+    public static function validateImage($image)
+    {
+        $validator = Validator::make(
+            ['image' => $image],
+            self::imageValidationRules()
+        );
+
+        if ($validator->fails()) {
+            throw ValidationException::withMessages($validator->errors()->toArray());
+        }
+
+        return true;
     }
 }
