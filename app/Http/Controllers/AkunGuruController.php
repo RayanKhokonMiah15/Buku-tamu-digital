@@ -3,67 +3,51 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Guru;
 
 class AkunGuruController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-         return view('guru.dashboard');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
-
     public function showLoginForm()
     {
         return view('guru.login');
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        // Debugging: Uncomment to see what's being submitted
+        // dd($request->only('username', 'password'));
+
+        if (Auth::guard('guru')->attempt([
+            'username' => $request->username,
+            'password' => $request->password
+        ])) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('guru.dashboard'));
+        }
+
+        return back()
+            ->withErrors(['error' => 'Username atau password salah'])
+            ->withInput($request->only('username'));
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::guard('guru')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('guru.login.form');
+    }
+
+    public function dashboard()
+    {
+        return view('guru.dashboard', [
+            'guru' => Auth::guard('guru')->user()
+        ]);
     }
 }
