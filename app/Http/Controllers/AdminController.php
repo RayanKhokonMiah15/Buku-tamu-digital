@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Report;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 
 class AdminController extends Controller
@@ -60,4 +61,14 @@ class AdminController extends Controller
         $reports = Report::latest()->get();
         return view('admin.dashboard', compact('reports'));
     }
+    public function logout(Request $request)
+{
+    Auth::logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/'); // atau bisa diarahkan ke login page: return redirect('/admin/login');
+}
+
 }

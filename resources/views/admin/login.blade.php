@@ -1,163 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin WhistleBlower Login</title>
-    <style>
-        /* Reset dan gaya dasar */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin WhistleBlower Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    /* Agar tidak bisa scroll */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-        }
+    /* Section full screen */
+    section.vh-100 {
+      height: 100vh;
+    }
 
-        .login-container {
-            background-color: #2d3748;
-            width: 400px;
-            padding: 40px 30px;
-            border-radius: 15px;
-            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
+    .bg-image-vertical {
+      position: relative;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-position: right center;
+      background-size: auto 100%;
+    }
 
-        .login-container:hover {
-            transform: scale(1.05);
-        }
-
-        .login-container h2 {
-            margin-bottom: 20px;
-            font-size: 1.8em;
-            color: #fff;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        label {
-            font-weight: 600;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-            display: inline-block;
-            color: #a0aec0;
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            outline: none;
-            background: #4a5568;
-            color: white;
-        }
-
-        input[type="text"]::placeholder, input[type="password"]::placeholder {
-            color: #cbd5e0;
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 12px 15px;
-            border: none;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .btn-login:hover {
-            background: linear-gradient(135deg, #2575fc, #6a11cb);
-        }
-
-        .form-footer {
-            margin-top: 20px;
-            font-size: 0.9em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .form-footer label {
-            cursor: pointer;
-        }
-
-        .form-footer a {
-            color: #63b3ed;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .form-footer a:hover {
-            color: #90cdf4;
-        }
-
-        .error-container {
-            background-color: #e53e3e;
-            padding: 10px;
-            border-radius: 8px;
-            color: white;
-            font-size: 0.9em;
-            margin-bottom: 20px;
-        }
-
-        .error-container ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    @media (min-width: 1025px) {
+      .h-custom-2 {
+        height: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login Admin</h2>
-        <!-- Tampilkan error kalau ada -->
-        @if($errors->any())
-            <div class="error-container">
-                <ul>
+  <section class="vh-100">
+    <div class="container-fluid h-100">
+      <div class="row h-100">
+        <div class="col-sm-6 text-black d-flex flex-column">
+
+        <div class="px-5 ms-xl-4 d-flex align-items-center">
+    <i class="fas fa-crow fa-2x me-3 pt-5 mt-xl-4"></i>
+    <img src="{{ asset('images/logo.png') }}" alt="Logo Image" class="me-3 pt-4 mt-xl-3" style="height: 50px; width: 50px; object-fit: contain;" />
+    <span class="h1 fw-bold mb-0 pt-4 mt-xl-3">Admin WhistleBlower</span>
+  </a>
+</div>
+
+
+          <div class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5 flex-grow-1">
+
+            <!-- Form login admin -->
+            <form style="width: 23rem;" method="POST" action="{{ route('admin.login.submit') }}">
+              @csrf
+
+              <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Login Admin</h3>
+
+              <!-- Tampilkan error kalau ada -->
+              @if($errors->any())
+                <div class="alert alert-danger">
+                  <ul class="mb-0">
                     @foreach($errors->all() as $e)
-                        <li>{{ $e }}</li>
+                      <li>{{ $e }}</li>
                     @endforeach
-                </ul>
-            </div>
-        @endif
+                  </ul>
+                </div>
+              @endif
 
-        <!-- Form login admin -->
-        <form method="POST" action="{{ route('admin.login.submit') }}">
-            @csrf <!-- Token proteksi form biar aman dari serangan CSRF -->
+              <div class="form-outline mb-4">
+                <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="Enter your username" required />
+                <label class="form-label" for="username">Username</label>
+              </div>
 
-            <!-- Input username -->
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" name="username" id="username" placeholder="Enter your username" required>
-            </div>
+              <div class="form-outline mb-4">
+                <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Enter your password" required />
+                <label class="form-label" for="password">Password</label>
+              </div>
 
-            <!-- Input password -->
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" name="password" id="password" placeholder="Enter your password" required>
-            </div>
+              <div class="pt-1 mb-4">
+                <button type="submit" class="btn btn-info btn-lg btn-block">Login</button>
+              </div>
 
-            <!-- Tombol login -->
-            <button type="submit" class="btn-login">Login</button>
-        </form>
+            <br><br><br><br><br><br>
+
+          </div>
+
+        </div>
+        <div class="col-sm-6 px-0 d-none d-sm-block">
+          <img
+            src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img3.webp"
+            alt="Login image"
+            class="w-100 vh-100"
+            style="object-fit: cover; object-position: left;"
+          />
+        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- FontAwesome untuk ikon -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

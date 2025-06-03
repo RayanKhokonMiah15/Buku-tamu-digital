@@ -1,45 +1,55 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\GuruController;
 
-// 127.0.0.1:8000/ aja
+// Halaman utama
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Halaman dashboard user biasa
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Routing untuk user biasa (profile dan report)
 Route::middleware('auth')->group(function () {
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-Route::middleware(['auth'])->group(function () {
+    // Reports
     Route::resource('reports', ReportController::class)->only([
-        'store',
-        'edit',
-        'update',
-        'destroy'
+        'store', 'edit', 'update', 'destroy'
     ]);
 });
 
-// Ini Buat routing autentikasi admin di 127.0.0.1:8000/admin/
-Route::get('/admin/login', [\App\Http\Controllers\AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/login', [\App\Http\Controllers\AdminAuthController::class, 'login'])->name('admin.login.submit');
-Route::post('/admin/logout', [\App\Http\Controllers\AdminAuthController::class, 'logout'])->name('admin.logout');
+// ============================
+// ===== ADMIN AUTH ROUTES ====
+// ============================
 
-// Ini Buat routing admin panel
+// Login Admin
+Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+
+// Logout Admin (gunakan dari AdminController agar konsisten)
+Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
+
+// ============================
+// ===== ADMIN DASHBOARD =====
+// ============================
+
 Route::middleware('admin')->group(function () {
+    // Dashboard Admin
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
+    // Kelola Laporan (Reports)
     Route::get('/admin/reports/{report}/edit', [AdminController::class, 'edit'])->name('admin.reports.edit');
     Route::put('/admin/reports/{report}', [AdminController::class, 'updateStatus'])->name('admin.reports.update');
     Route::delete('/admin/reports/{report}', [AdminController::class, 'destroy'])->name('admin.reports.destroy');
@@ -53,4 +63,5 @@ Route::middleware('admin')->group(function () {
     Route::delete('/admin/guru/{id}', [GuruController::class, 'destroy'])->name('guru.destroy');
 });
 
+// Include routes dari Laravel Breeze/Fortify/Auth bawaan
 require __DIR__ . '/auth.php';
