@@ -8,10 +8,6 @@ use Illuminate\Http\Request;
 class GuruController extends Controller
 {
     // ini buat dashboard admin dik
-    public function dashboard()
-    {
-        return view('guru.index');
-    }
     
     public function create()
     {
@@ -69,4 +65,5 @@ class GuruController extends Controller
         $guru->delete();
         return redirect()->route('guru.index')->with('success', 'Guru berhasil dihapus.');
     }
+    
 }

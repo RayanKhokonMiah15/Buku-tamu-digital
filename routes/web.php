@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AkunGuruController;
 use App\Http\Controllers\GuruController;
 
 // Halaman utama
@@ -61,7 +62,23 @@ Route::middleware('admin')->group(function () {
     Route::get('/admin/guru/{id}/edit', [GuruController::class, 'edit'])->name('guru.edit');
     Route::put('/admin/guru/{id}', [GuruController::class, 'update'])->name('guru.update');
     Route::delete('/admin/guru/{id}', [GuruController::class, 'destroy'])->name('guru.destroy');
+
 });
+
+
+   // Hapus route yang ada di dalam middleware admin
+// Tambahkan ini di luar middleware:
+
+Route::prefix('guru')->group(function() {
+    // Halaman login guru (akses publik)
+    Route::get('/login', [AkunGuruController::class, 'showLoginForm'])->name('guru.login');
+    
+    // Halaman dashboard guru (perlu autentikasi)
+    Route::get('/dashboard', [AkunGuruController::class, 'index'])
+         ->middleware('auth:guru') // Sesuaikan dengan guard yang digunakan
+         ->name('guru.dashboard');
+});
+
 
 // Include routes dari Laravel Breeze/Fortify/Auth bawaan
 require __DIR__ . '/auth.php';
