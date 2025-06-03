@@ -20,12 +20,10 @@ Route::get('/dashboard', function () {
 
 // Routing untuk user biasa (profile dan report)
 Route::middleware('auth')->group(function () {
-    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Reports
     Route::resource('reports', ReportController::class)->only([
         'store', 'edit', 'update', 'destroy'
     ]);
@@ -34,51 +32,45 @@ Route::middleware('auth')->group(function () {
 // ============================
 // ===== ADMIN AUTH ROUTES ====
 // ============================
+Route::middleware('guest:admin')->group(function() {
+    Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+});
 
-// Login Admin
-Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
-
-// Logout Admin (gunakan dari AdminController agar konsisten)
-Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
+Route::middleware('auth:admin')->group(function() {
+    Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
+});
 
 // ============================
 // ===== ADMIN DASHBOARD =====
 // ============================
-
 Route::middleware('admin')->group(function () {
-    // Dashboard Admin
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
-    // Kelola Laporan (Reports)
     Route::get('/admin/reports/{report}/edit', [AdminController::class, 'edit'])->name('admin.reports.edit');
     Route::put('/admin/reports/{report}', [AdminController::class, 'updateStatus'])->name('admin.reports.update');
     Route::delete('/admin/reports/{report}', [AdminController::class, 'destroy'])->name('admin.reports.destroy');
 
     // CRUD Guru
-    Route::get('/admin/guru', [GuruController::class, 'index'])->name('guru.index');
-    Route::get('/admin/guru/create', [GuruController::class, 'create'])->name('guru.create');
-    Route::post('/admin/guru', [GuruController::class, 'store'])->name('guru.store');
-    Route::get('/admin/guru/{id}/edit', [GuruController::class, 'edit'])->name('guru.edit');
-    Route::put('/admin/guru/{id}', [GuruController::class, 'update'])->name('guru.update');
-    Route::delete('/admin/guru/{id}', [GuruController::class, 'destroy'])->name('guru.destroy');
-
+    Route::prefix('admin')->group(function() {
+        Route::resource('guru', GuruController::class)->except(['show']);
+    });
 });
 
+// ============================
+// ===== GURU AUTH ROUTES =====
+// ============================
+Route::prefix('guru')->name('guru.')->group(function() {
+    // Public routes (accessible without auth)
+    Route::middleware('guest:guru')->group(function() {
+        Route::get('/login', [AkunGuruController::class, 'showLoginForm'])->name('login.form');
+        Route::post('/login', [AkunGuruController::class, 'login'])->name('login');
+    });
 
-   // Hapus route yang ada di dalam middleware admin
-// Tambahkan ini di luar middleware:
-
-Route::prefix('guru')->group(function() {
-    // Halaman login guru (akses publik)
-    Route::get('/login', [AkunGuruController::class, 'showLoginForm'])->name('guru.login');
-    
-    // Halaman dashboard guru (perlu autentikasi)
-    Route::get('/dashboard', [AkunGuruController::class, 'index'])
-         ->middleware('auth:guru') // Sesuaikan dengan guard yang digunakan
-         ->name('guru.dashboard');
+    // Protected routes (require guru auth)
+    Route::middleware('auth:guru')->group(function() {
+        Route::post('/logout', [AkunGuruController::class, 'logout'])->name('logout');
+        Route::get('/dashboard', [AkunGuruController::class, 'dashboard'])->name('dashboard');
+    });
 });
 
-
-// Include routes dari Laravel Breeze/Fortify/Auth bawaan
 require __DIR__ . '/auth.php';
