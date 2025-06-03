@@ -141,6 +141,20 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: titleGlow 2s ease-in-out infinite alternate;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease forwards, titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes titleGlow {
@@ -184,16 +198,39 @@
             padding: 1.5rem;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 0.75rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
         }
 
         .light-mode .feature-card {
             background: rgba(255, 255, 255, 0.9);
         }
 
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(59, 130, 246, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(59, 130, 246, 0.3);
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
         }
 
         .feature-icon {
@@ -281,9 +318,22 @@
             max-width: 400px;
             height: auto;
             border-radius: 2rem;
-            transition: transform 0.5s ease;
+            transition: all 0.5s ease;
             position: relative;
             z-index: 1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
         }
 
         .image-overlay {

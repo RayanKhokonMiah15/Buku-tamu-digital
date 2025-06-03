@@ -32,23 +32,65 @@
                 @endif
 
                 {{-- Form edit laporan --}}
-                <form action="{{ route('reports.update', $report) }}" method="POST">
+                <form action="{{ route('reports.update', $report) }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    @method('PUT') {{-- Pakai method PUT untuk update data --}}
+                    @method('PUT')
 
-                    {{-- Input judul --}}
-                    <div class="mb-4">
-                        <label class="block text-sm mb-1" for="judul">Judul</label>
-                        <input type="text" id="judul" name="judul" value="{{ old('judul', $report->judul) }}"
-                            class="w-full px-4 py-2 bg-[#2a2a2a] text-white rounded border border-[#444] focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    </div>
+                    <div class="bg-[#262626] p-6 rounded-lg border border-[#333] mb-6">
+                        {{-- Preview card --}}
+                        <div class="mb-6">
+                            <h4 class="text-sm font-medium text-gray-400 mb-2">Preview Laporan</h4>
+                            <div class="bg-[#1e1e1e] rounded-lg p-4">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <div class="h-8 w-8 bg-purple-600 rounded-full flex items-center justify-center">
+                                        <span class="text-white text-sm">{{ substr(Auth::user()->username, 0, 1) }}</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-300">{{ Auth::user()->username }}</p>
+                                        <p class="text-xs text-gray-500">{{ $report->created_at->format('d M Y • H:i') }}</p>
+                                    </div>
+                                </div>
+                                <h2 class="text-xl font-bold text-gray-100 mb-2" id="preview-title">{{ old('judul', $report->judul) }}</h2>
+                                <p class="text-gray-300 mb-4" id="preview-content">{{ old('isi_laporan', $report->isi_laporan) }}</p>
+                            </div>
+                        </div>
 
-                    {{-- Input isi laporan --}}
-                    <div class="mb-4">
-                        <label class="block text-sm mb-1" for="isi_laporan">Isi Laporan</label>
-                        <textarea id="isi_laporan" name="isi_laporan" rows="5"
-                            class="w-full px-4 py-2 bg-[#2a2a2a] text-white rounded border border-[#444] focus:outline-none focus:ring-2 focus:ring-purple-500">{{ old('isi_laporan', $report->isi_laporan) }}</textarea>
-                    </div>
+                        {{-- Input judul --}}
+                        <div class="mb-4">
+                            <label class="block text-sm mb-1 text-gray-300" for="judul">Judul Laporan</label>
+                            <input type="text" id="judul" name="judul"
+                                value="{{ old('judul', $report->judul) }}"
+                                class="w-full px-4 py-2 bg-[#1e1e1e] text-gray-100 rounded border border-[#444] focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                oninput="document.getElementById('preview-title').textContent = this.value">
+                        </div>
+
+                        {{-- Input isi laporan --}}
+                        <div class="mb-4">
+                            <label class="block text-sm mb-1 text-gray-300" for="isi_laporan">Isi Laporan</label>
+                            <textarea id="isi_laporan" name="isi_laporan"
+                                rows="5"
+                                class="w-full px-4 py-2 bg-[#1e1e1e] text-gray-100 rounded border border-[#444] focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                oninput="document.getElementById('preview-content').textContent = this.value">{{ old('isi_laporan', $report->isi_laporan) }}</textarea>
+                        </div>
+
+                        {{-- Image upload --}}
+                        <div class="mb-4">
+                            <label class="block text-sm mb-1 text-gray-300">Bukti Foto</label>
+                            <div class="flex items-center space-x-2">
+                                <label class="flex items-center px-4 py-2 bg-[#333] text-gray-300 rounded-lg cursor-pointer hover:bg-[#444] transition duration-200">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    Ganti Foto
+                                    <input type="file" name="image" accept="image/*" class="hidden" onchange="showPreview(this)">
+                                </label>
+                            </div>
+                            <div id="imagePreview" class="mt-4 {{ $report->image_path ? '' : 'hidden' }}">
+                                <img src="{{ $report->image_path ? asset('storage/' . $report->image_path) : '#' }}"
+                                     alt="Preview"
+                                     class="max-h-48 rounded-lg">
+                            </div>
+                        </div>
 
                     {{-- Input nama pelaku --}}
                     <div class="mb-4">

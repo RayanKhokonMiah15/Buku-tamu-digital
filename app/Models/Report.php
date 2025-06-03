@@ -18,6 +18,7 @@ class Report extends Model
         'reporter_class',     // kelas pelapor
         'reporter_major',     // jurusan pelapor
         'peran',              // peran pelapor (saksi/korban)
+        'image_path', // <- tambahkan ini
         'is_anonymous',       // true kalau pelapor pilih anonim
         'status',             // status laporan (misalnya: pending, ditinjau, selesai)
     ];

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 // Controller buat handle laporan (buat, edit, update, hapus)
 class ReportController extends Controller
@@ -14,25 +15,35 @@ class ReportController extends Controller
     {
         // Validasi input dari form laporan
         $validated = $request->validate([
-            'judul' => 'required|string|max:255', // judul wajib diisi
-            'isi_laporan' => 'required|string',   // isi laporan juga wajib
+            'judul' => 'required|string|max:255',
+            'isi_laporan' => 'required|string',
             'nama_pelaku' => 'required|string|max:255',
             'kelas_pelaku' => 'required|string|max:255',
             'jurusan_pelaku' => 'required|string|max:255',
-            'is_anonymous' => 'required|boolean', // checkbox anonim wajib dikirim
-            'reporter_name' => 'nullable|string|max:255', // boleh kosong
+            'is_anonymous' => 'required|boolean',
+            'reporter_name' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi file gambar
             'reporter_class' => 'nullable|string|max:255',
             'reporter_major' => 'nullable|string|max:255',
             'peran' => 'required|in:saksi,korban', // harus pilih saksi atau korban
         ]);
 
-        // Buat objek laporan baru pake data yang udah divalidasi
+        // Handle upload gambar jika ada
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+
+            // Ensure directory exists
+            Storage::makeDirectory('public/images');
+
+            // Store the image
+            $image->storeAs('public/images', $imageName);
+            $validated['image_path'] = 'images/' . $imageName;
+        }
+
+        // Buat objek laporan baru
         $report = new Report($validated);
-
-        // Simpan ID user yang lagi login ke field user_id di laporan
         $report->user_id = Auth::id();
-
-        // Simpan laporan ke database
         $report->save();
 
         // Balik ke halaman sebelumnya dengan notifikasi sukses
@@ -49,7 +60,7 @@ class ReportController extends Controller
     // Fungsi buat update laporan setelah diedit
     public function update(Request $request, Report $report)
     {
-        // Validasi ulang data yang diedit
+        // Validasi data
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'isi_laporan' => 'required|string',
@@ -61,7 +72,25 @@ class ReportController extends Controller
             'reporter_name' => 'nullable|string|max:255',
             'reporter_class' => 'nullable|string|max:255',
             'reporter_major' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        // Handle image update
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($report->image_path) {
+                Storage::delete('public/' . $report->image_path);
+            }
+
+            // Ensure directory exists
+            Storage::makeDirectory('public/images');
+
+            // Store new image
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/images', $imageName);
+            $validated['image_path'] = 'images/' . $imageName;
+        }
 
         // Kalau user pilih "anonim", hapus info pelapor & set anonim true
         if ($request->has('is_anonymous')) {
@@ -84,6 +113,11 @@ class ReportController extends Controller
     // Fungsi buat hapus laporan
     public function destroy(Report $report)
     {
+        // Delete image file if exists
+        if ($report->image_path) {
+            Storage::delete('public/' . $report->image_path);
+        }
+
         // Hapus data laporan dari database
         $report->delete();
 
