@@ -2,68 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\Guru;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class GuruController extends Controller
 {
-    // ini buat dashboard admin dik
-    
+    public function index()
+    {
+        $gurus = Guru::all();
+        return view('guru.index', compact('gurus'));
+    }
+
     public function create()
     {
         return view('guru.create');
     }
 
-    // Menampilkan daftar guru
-    public function index()
-    {
-        $gurus = \App\Models\Guru::all();
-        return view('guru.index', compact('gurus'));
-    }
-
-    // Menyimpan data admin baru
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'username' => 'required|string|max:255|unique:gurus,username',
-            'password' => 'required|string|min:6',
+        $request->validate([
+            'username' => 'required|unique:gurus',
+            'password' => 'required|min:6',
         ]);
-        // Jika ingin menyimpan password yang sudah di-hash, uncomment baris berikut
-        // $validated['password'] = bcrypt($validated['password']);
-        \App\Models\Guru::create($validated);
-        return redirect()->route('guru.index')->with('success', 'Guru berhasil ditambahkan.');
+
+        Guru::create([
+            'username' => $request->username,
+            'password' => $request->password, // Will be hashed by the model
+        ]);
+
+        return redirect()->route('guru.index')
+            ->with('success', 'Guru berhasil ditambahkan');
     }
 
-    // Menampilkan form edit admin
-    public function edit($id)
+    public function edit(Guru $guru)
     {
-        $guru = \App\Models\Guru::findOrFail($id);
         return view('guru.edit', compact('guru'));
     }
 
-    // Mengupdate data admin
-    public function update(Request $request, $id)
+    public function update(Request $request, Guru $guru)
     {
-        $guru = \App\Models\Guru::findOrFail($id);
-        $validated = $request->validate([
-            'username' => 'required|string|max:255|unique:gurus,username,' . $id . ',id_guru',
-            'password' => 'nullable|string|min:6',
+        $request->validate([
+            'username' => 'required|unique:gurus,username,' . $guru->id_guru . ',id_guru',
+            'password' => 'nullable|min:6',
         ]);
-        if ($validated['password']) {
-            $validated['password'] = bcrypt($validated['password']);
-        } else {
-            unset($validated['password']);
+
+        $guru->username = $request->username;
+        if ($request->filled('password')) {
+            $guru->password = $request->password;
         }
-        $guru->update($validated);
-        return redirect()->route('guru.index')->with('success', 'Guru berhasil diupdate.');
+        $guru->save();
+
+        return redirect()->route('guru.index')
+            ->with('success', 'Guru berhasil diupdate');
     }
 
-    // Menghapus data admin
-    public function destroy($id)
+    public function destroy(Guru $guru)
     {
-        $guru = \App\Models\Guru::findOrFail($id);
         $guru->delete();
-        return redirect()->route('guru.index')->with('success', 'Guru berhasil dihapus.');
+        return redirect()->route('guru.index')
+            ->with('success', 'Guru berhasil dihapus');
     }
-    
 }
