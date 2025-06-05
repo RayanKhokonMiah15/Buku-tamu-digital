@@ -50,6 +50,7 @@ php artisan key:generate
 4. Set your DB credentials in `.env`, then run migrations:
 ```bash
 php artisan migrate
+php artisan db:seed
 php artisan storage:link
 ```
 
@@ -67,6 +68,11 @@ you can contribute with creating a fork and pull request or submit a patch via i
   <img src="https://contrib.rocks/image?repo=fauzymadani/WhistleBlower&max=50&columns=10&anon=1" />
 </a>
 
+## Commits
+[![activity](https://github-readme-activity-graph.vercel.app/graph?username=fauzymadani&theme=react-dark)](https://github.com/ashutosh00710/github-readme-activity-graph)
+[![activity](https://github-readme-activity-graph.vercel.app/graph?username=andikagithub1&theme=react-dark)](https://github.com/ashutosh00710/github-readme-activity-graph)
+[![activity](https://github-readme-activity-graph.vercel.app/graph?username=AgungPajar&theme=react-dark)](https://github.com/ashutosh00710/github-readme-activity-graph)
+[![activity](https://github-readme-activity-graph.vercel.app/graph?username=Azzelzz&theme=react-dark)](https://github.com/ashutosh00710/github-readme-activity-graph)
 # License
 [GNU General Public License v3.0 (GPL-3.0)](https://www.gnu.org/licenses/gpl-3.0.html)
 
