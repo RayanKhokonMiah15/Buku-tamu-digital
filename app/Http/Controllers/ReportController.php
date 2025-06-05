@@ -6,46 +6,82 @@ use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\ReportRequest;
+use Illuminate\Support\Facades\Validator;
 
-// Controller buat handle laporan (buat, edit, update, hapus)
 class ReportController extends Controller
 {
-    // Fungsi buat nyimpan laporan baru dari user
-    public function store(ReportRequest $request)
+    /**
+     * Menyimpan laporan baru yang dibuat oleh pengguna.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(Request $request)
     {
-        // Get validated data
-        $validated = $request->validated();
+        // Validasi input dari form
+        $validator = Validator::make($request->all(), [
+            'judul' => 'required|string|max:255',
+            'isi_laporan' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,gif|max:5120', // Maks 5MB
+            'nama_pelaku' => 'required_unless:unknown_perpetrator,1|string|max:255',
+            'kelas_pelaku' => 'required_unless:unknown_perpetrator,1|string|max:255',
+            'jurusan_pelaku' => 'required_unless:unknown_perpetrator,1|string|max:255',
+            'peran' => 'required|in:saksi,korban',
+            'is_anonymous' => 'boolean',
+            'reporter_name' => 'nullable|string|max:255',
+            'reporter_class' => 'nullable|string|max:255',
+            'reporter_major' => 'nullable|string|max:255',
+            'unknown_perpetrator' => 'boolean',
+        ], [
+            'judul.required' => 'Judul laporan wajib diisi.',
+            'isi_laporan.required' => 'Isi laporan wajib diisi.',
+            'image.image' => 'File harus berupa gambar (JPG, PNG, atau GIF).',
+            'image.max' => 'Ukuran gambar maksimal 5MB.',
+            'nama_pelaku.required_unless' => 'Nama pelaku wajib diisi jika pelaku diketahui.',
+            'kelas_pelaku.required_unless' => 'Kelas pelaku wajib diisi jika pelaku diketahui.',
+            'jurusan_pelaku.required_unless' => 'Jurusan pelaku wajib diisi jika pelaku diketahui.',
+            'peran.required' => 'Peran wajib dipilih.',
+            'peran.in' => 'Peran harus berupa saksi atau korban.',
+        ]);
 
-        // Handle upload gambar jika ada
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $validated = $validator->validated();
+
+        // Tangani upload gambar jika ada
         if ($request->hasFile('image')) {
             try {
                 $image = $request->file('image');
                 $imageName = time() . '_' . $image->getClientOriginalName();
-
-                // Ensure directory exists
                 Storage::makeDirectory('public/images');
-
-                // Store the image
                 $image->storeAs('public/images', $imageName);
                 $validated['image_path'] = 'images/' . $imageName;
             } catch (\Exception $e) {
-                return back()->withErrors(['image' => 'Gagal mengunggah gambar. Silakan coba lagi.']);
+                return back()->withErrors(['image' => 'Gagal mengunggah gambar: ' . $e->getMessage()])->withInput();
             }
         }
 
-        // Handle unknown perpetrator
+        // Tangani pelaku tidak diketahui
         if ($request->has('unknown_perpetrator') && $request->unknown_perpetrator) {
             $validated['nama_pelaku'] = 'Tidak Diketahui';
             $validated['kelas_pelaku'] = 'Tidak Diketahui';
             $validated['jurusan_pelaku'] = 'Tidak Diketahui';
         }
 
-        // Buat objek laporan baru
+        // Tangani laporan anonim
+        $validated['is_anonymous'] = $request->has('is_anonymous') && $request->is_anonymous;
+        if ($validated['is_anonymous']) {
+            $validated['reporter_name'] = null;
+            $validated['reporter_class'] = null;
+            $validated['reporter_major'] = null;
+        }
+
         try {
             $report = new Report($validated);
 
-            // Set the appropriate ID based on who's creating the report
+            // Set ID berdasarkan pengguna yang membuat laporan
             if (Auth::guard('guru')->check()) {
                 $report->guru_id = Auth::guard('guru')->id();
             } else {
@@ -56,160 +92,228 @@ class ReportController extends Controller
 
             return redirect()->back()->with('success', 'Laporan berhasil dikirim.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Gagal menyimpan laporan. Silakan coba lagi.']);
+            return back()->withErrors(['error' => 'Gagal menyimpan laporan: ' . $e->getMessage()])->withInput();
         }
     }
 
-    // Fungsi buat nampilin form edit laporan
+    /**
+     * Menampilkan form untuk mengedit laporan.
+     *
+     * @param Report $report
+     * @return \Illuminate\View\View
+     */
     public function edit(Report $report)
     {
-        // Check if the authenticated user owns this report
+        // Periksa kepemilikan laporan
         if (Auth::guard('guru')->check()) {
             if ($report->guru_id !== Auth::guard('guru')->id()) {
-                abort(403);
+                abort(403, 'Anda tidak memiliki izin untuk mengedit laporan ini.');
             }
         } else {
             if ($report->user_id !== Auth::id()) {
-                abort(403);
+                abort(403, 'Anda tidak memiliki izin untuk mengedit laporan ini.');
             }
         }
 
-        // Tampilkan view edit dan lempar data laporan ke view
         return view('reports.edit', compact('report'));
     }
 
-    // Fungsi buat update laporan setelah diedit
-    public function update(ReportRequest $request, Report $report)
+    /**
+     * Memperbarui laporan yang sudah ada.
+     *
+     * @param Request $request
+     * @param Report $report
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(Request $request, Report $report)
     {
-        // Check ownership
+        // Periksa kepemilikan laporan
         if (Auth::guard('guru')->check()) {
             if ($report->guru_id !== Auth::guard('guru')->id()) {
-                abort(403);
+                abort(403, 'Anda tidak memiliki izin untuk mengedit laporan ini.');
             }
         } else {
             if ($report->user_id !== Auth::id()) {
-                abort(403);
+                abort(403, 'Anda tidak memiliki izin untuk mengedit laporan ini.');
             }
         }
 
-        // Get validated data
-        $validated = $request->validated();
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'judul' => 'required|string|max:255',
+            'isi_laporan' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,gif|max:5120', // Maks 5MB
+            'nama_pelaku' => 'required_unless:unknown_perpetrator,1|string|max:255',
+            'kelas_pelaku' => 'required_unless:unknown_perpetrator,1|string|max:255',
+            'jurusan_pelaku' => 'required_unless:unknown_perpetrator,1|string|max:255',
+            'peran' => 'required|in:saksi,korban',
+            'is_anonymous' => 'boolean',
+            'reporter_name' => 'nullable|string|max:255',
+            'reporter_class' => 'nullable|string|max:255',
+            'reporter_major' => 'nullable|string|max:255',
+            'unknown_perpetrator' => 'boolean',
+        ], [
+            'judul.required' => 'Judul laporan wajib diisi.',
+            'isi_laporan.required' => 'Isi laporan wajib diisi.',
+            'image.image' => 'File harus berupa gambar (JPG, PNG, atau GIF).',
+            'image.max' => 'Ukuran gambar maksimal 5MB.',
+            'nama_pelaku.required_unless' => 'Nama pelaku wajib diisi jika pelaku diketahui.',
+            'kelas_pelaku.required_unless' => 'Kelas pelaku wajib diisi jika pelaku diketahui.',
+            'jurusan_pelaku.required_unless' => 'Jurusan pelaku wajib diisi jika pelaku diketahui.',
+            'peran.required' => 'Peran wajib dipilih.',
+            'peran.in' => 'Peran harus berupa saksi atau korban.',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $validated = $validator->validated();
 
         try {
-            // Handle image update
+            // Tangani pembaruan gambar
             if ($request->hasFile('image')) {
-                // Delete old image if exists
+                // Hapus gambar lama jika ada
                 if ($report->image_path) {
                     Storage::delete('public/' . $report->image_path);
                 }
 
-                // Store new image
                 $image = $request->file('image');
                 $imageName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('public/images', $imageName);
                 $validated['image_path'] = 'images/' . $imageName;
             }
 
-            // Handle unknown perpetrator
+            // Tangani pelaku tidak diketahui
             if ($request->has('unknown_perpetrator') && $request->unknown_perpetrator) {
                 $validated['nama_pelaku'] = 'Tidak Diketahui';
                 $validated['kelas_pelaku'] = 'Tidak Diketahui';
                 $validated['jurusan_pelaku'] = 'Tidak Diketahui';
             }
 
-            // Handle anonymous report
-            if ($request->has('is_anonymous')) {
+            // Tangani laporan anonim
+            $validated['is_anonymous'] = $request->has('is_anonymous') && $request->is_anonymous;
+            if ($validated['is_anonymous']) {
                 $validated['reporter_name'] = null;
                 $validated['reporter_class'] = null;
                 $validated['reporter_major'] = null;
-                $validated['is_anonymous'] = true;
-            } else {
-                $validated['is_anonymous'] = false;
             }
 
-            // Update report
             $report->update($validated);
 
             $redirectRoute = Auth::guard('guru')->check() ? 'guru.dashboard' : 'dashboard';
-            return redirect()->route($redirectRoute)->with('success', 'Laporan berhasil diperbarui!');
+            return redirect()->route($redirectRoute)->with('success', 'Laporan berhasil diperbarui.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Gagal memperbarui laporan. Silakan coba lagi.']);
+            return back()->withErrors(['error' => 'Gagal memperbarui laporan: ' . $e->getMessage()])->withInput();
         }
     }
 
-    // Fungsi buat hapus laporan
+    /**
+     * Menghapus laporan.
+     *
+     * @param Report $report
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function destroy(Report $report)
     {
-        // Check ownership
+        // Periksa kepemilikan laporan
         if (Auth::guard('guru')->check()) {
             if ($report->guru_id !== Auth::guard('guru')->id()) {
-                abort(403);
+                abort(403, 'Anda tidak memiliki izin untuk menghapus laporan ini.');
             }
         } else {
             if ($report->user_id !== Auth::id()) {
-                abort(403);
+                abort(403, 'Anda tidak memiliki izin untuk menghapus laporan ini.');
             }
         }
 
-        // Delete image file if exists
-        if ($report->image_path) {
-            Storage::delete('public/' . $report->image_path);
+        try {
+            // Hapus gambar jika ada
+            if ($report->image_path) {
+                Storage::delete('public/' . $report->image_path);
+            }
+
+            $report->delete();
+            return redirect()->back()->with('success', 'Laporan berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menghapus laporan: ' . $e->getMessage()]);
         }
-
-        // Hapus data laporan dari database
-        $report->delete();
-
-        // Balik ke halaman sebelumnya dengan pesan sukses
-        return redirect()->back()->with('success', 'Laporan berhasil dihapus.');
     }
 
+    /**
+     * Menangani laporan oleh guru.
+     *
+     * @param Report $report
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function handleReport(Report $report)
     {
-        // Check if report is already handled
         if ($report->handled_by_guru_id !== null) {
-            return back()->with('error', 'Laporan ini sudah ditangani oleh guru lain.');
+            return back()->withErrors(['error' => 'Laporan ini sudah ditangani oleh guru lain.']);
         }
 
-        // Set the current guru as the handler
-        $report->handled_by_guru_id = Auth::guard('guru')->id();
-        $report->status = 'proses'; // Automatically set status to "proses" when handled
-        $report->save();
-
-        return back()->with('success', 'Anda sekarang menangani laporan ini.');
+        try {
+            $report->handled_by_guru_id = Auth::guard('guru')->id();
+            $report->status = 'proses';
+            $report->save();
+            return back()->with('success', 'Anda sekarang menangani laporan ini.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menangani laporan: ' . $e->getMessage()]);
+        }
     }
 
+    /**
+     * Memperbarui status laporan.
+     *
+     * @param Request $request
+     * @param Report $report
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function updateStatus(Request $request, Report $report)
     {
-        // Verify that the authenticated guru is the handler
         if ($report->handled_by_guru_id !== Auth::guard('guru')->id()) {
-            abort(403, 'Anda tidak berwenang mengubah status laporan ini.');
+            abort(403, 'Anda tidak memiliki izin untuk mengubah status laporan ini.');
         }
 
-        $validated = $request->validate([
-            'status' => 'required|in:pending,proses,selesai'
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:pending,proses,selesai',
+        ], [
+            'status.required' => 'Status wajib dipilih.',
+            'status.in' => 'Status harus berupa pending, proses, atau selesai.',
         ]);
 
-        $report->update($validated);
+        if ($validator->fails()) {
+            return back()->withErrors($validator);
+        }
 
-        return back()->with('success', 'Status laporan berhasil diperbarui.');
+        try {
+            $report->update($validator->validated());
+            return back()->with('success', 'Status laporan berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal memperbarui status: ' . $e->getMessage()]);
+        }
     }
 
+    /**
+     * Menampilkan detail laporan.
+     *
+     * @param Report $report
+     * @return \Illuminate\View\View
+     */
     public function show(Report $report)
     {
-        // Check ownership
+        // Periksa kepemilikan laporan
         if (Auth::guard('guru')->check()) {
             if ($report->guru_id !== Auth::guard('guru')->id()) {
-                abort(403);
+                abort(403, 'Anda tidak memiliki izin untuk melihat laporan ini.');
             }
         } else {
             if ($report->user_id !== Auth::id()) {
-                abort(403);
+                abort(403, 'Anda tidak memiliki izin untuk melihat laporan ini.');
             }
         }
 
-        // Load necessary relationships
         $report->load(['handlingGuru', 'user', 'guru']);
-
         return view('reports.show', compact('report'));
     }
 }
