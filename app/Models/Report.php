@@ -22,7 +22,8 @@ class Report extends Model
         'peran',              // peran pelapor (saksi/korban)
         'image_path', // <- tambahkan ini
         'is_anonymous',       // true kalau pelapor pilih anonim
-        'status',             // status laporan (misalnya: pending, ditinjau, selesai)
+        'status',
+        'handled_by_guru_id',
     ];
 
     // Auto-cast 'is_anonymous' ke tipe boolean pas ambil dari DB
@@ -34,6 +35,37 @@ class Report extends Model
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
+    }
+
+    public function guru()
+    {
+        return $this->belongsTo(\App\Models\Guru::class, 'guru_id', 'id_guru');
+    }
+
+    public function handlingGuru()
+    {
+        return $this->belongsTo(\App\Models\Guru::class, 'handled_by_guru_id', 'id_guru');
+    }
+
+    public function getReporterType()
+    {
+        if ($this->guru_id) {
+            return 'Guru';
+        }
+        return 'Siswa';
+    }
+
+    public function getReporterName()
+    {
+        if ($this->is_anonymous) {
+            return 'Anonim';
+        }
+
+        if ($this->guru_id) {
+            return $this->guru->username ?? 'Guru';
+        }
+
+        return $this->user->username ?? 'Siswa';
     }
 
     /**

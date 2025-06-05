@@ -18,4 +18,9 @@ class Guru extends Authenticatable
     {
         $this->attributes['password'] = bcrypt($value);
     }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class, 'guru_id', 'id_guru');
+    }
 }

@@ -24,7 +24,10 @@
             color: #ffffff;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 10;
         }
 
         .sidebar h4 {
@@ -88,13 +91,83 @@
         /* Main content area */
         .main-content {
             flex-grow: 1;
-            padding: 30px;
+            margin-left: 250px;
+            padding: 2rem;
+            max-width: calc(100vw - 250px);
             background: #f8f9fa;
         }
 
         .main-content h1 {
             font-size: 2rem;
             margin-bottom: 20px;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .report-content {
+            padding: 1.5rem;
+        }
+
+        .handling-info {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .handling-info-title {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .handling-info-content {
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .status-badge.pending {
+            background-color: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+        }
+
+        .status-badge.process {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #93c5fd;
+        }
+
+        .status-badge.done {
+            background-color: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #86efac;
         }
 
         /* Responsive adjustments */

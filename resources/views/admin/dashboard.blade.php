@@ -18,25 +18,51 @@
                         <div class="report-header">
                             <div class="report-info">
                                 <div>
-                                    <span class="report-date">{{ $report->created_at->format('d M Y • H:i') }}</span>
+                                    <span class="report-date">{{ $report->created_at->format('d M Y • H:i') }} • {{ $report->getReporterType() }}</span>
                                     <h3 class="report-title">{{ $report->judul }}</h3>
+
+                                    {{-- Status Badge --}}
+                                    <span class="status-badge {{ $report->status }}">
+                                        @if($report->status == 'pending')
+                                            ⏳ Pending
+                                        @elseif($report->status == 'proses')
+                                            🔄 Dalam Proses
+                                        @else
+                                            ✅ Selesai
+                                        @endif
+                                    </span>
                                 </div>
                             </div>
-                            {{-- Dropdown Status --}}
-                            <form action="{{ route('admin.reports.update', $report->id) }}" method="POST">
-                                @csrf
-                                @method('PUT')
-                                <select name="status"
-                                        onchange="this.form.submit()"
-                                        class="status-select {{ $report->status == 'pending' ? 'status-pending' : '' }}
-                                        {{ $report->status == 'proses' ? 'status-process' : '' }}
-                                        {{ $report->status == 'selesai' ? 'status-done' : '' }}">
-                                    <option value="pending" {{ $report->status == 'pending' ? 'selected' : '' }}>⏳ Pending</option>
-                                    <option value="proses" {{ $report->status == 'proses' ? 'selected' : '' }}>🔄 Proses</option>
-                                    <option value="selesai" {{ $report->status == 'selesai' ? 'selected' : '' }}>✅ Selesai</option>
-                                </select>
-                            </form>
+
+                            {{-- Actions --}}
+                            <div class="report-actions">
+                                {{-- Status Form --}}
+                                <form action="{{ route('admin.reports.update', $report->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <select name="status"
+                                            onchange="this.form.submit()"
+                                            class="form-select form-select-sm">
+                                        <option value="pending" {{ $report->status == 'pending' ? 'selected' : '' }}>Ubah ke: Pending</option>
+                                        <option value="proses" {{ $report->status == 'proses' ? 'selected' : '' }}>Ubah ke: Proses</option>
+                                        <option value="selesai" {{ $report->status == 'selesai' ? 'selected' : '' }}>Ubah ke: Selesai</option>
+                                    </select>
+                                </form>
+                            </div>
                         </div>
+
+                        {{-- Guru Handling Info --}}
+                        @if($report->handled_by_guru_id)
+                            <div class="handling-info">
+                                <div class="handling-info-title">Informasi Penanganan</div>
+                                <div class="handling-info-content">
+                                    👨‍🏫 Ditangani oleh: {{ $report->handlingGuru->username ?? 'Unknown' }}
+                                </div>
+                                <div class="handling-info-content mt-1">
+                                    📅 Status: {{ ucfirst($report->status) }}
+                                </div>
+                            </div>
+                        @endif
 
                         {{-- Isi Laporan --}}
                         <div class="report-body">
@@ -55,19 +81,11 @@
                                              loading="lazy"
                                              onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23999999\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cline x1=\'18\' y1=\'6\' x2=\'6\' y2=\'18\'%3E%3C/line%3E%3Cline x1=\'6\' y1=\'6\' x2=\'18\' y2=\'18\'%3E%3C/line%3E%3C/svg%3E'; this.classList.add('p-8');">
                                     </div>
-                                    <div class="image-overlay">
-                                        <span class="zoom-text">
-                                            <svg class="zoom-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
-                                            </svg>
-                                            Klik untuk memperbesar
-                                        </span>
-                                    </div>
                                 </div>
                             </div>
                         @endif
 
-                        {{-- Informasi Pelaku --}}
+                        {{-- Info Grid --}}
                         <div class="info-grid">
                             <div class="info-card">
                                 <span class="info-label">👤 Nama Pelaku</span>
@@ -87,86 +105,67 @@
                             </div>
                         </div>
 
-                        @if($report->is_anonymous)
-                            <div class="reporter-info">
-                                <p class="info-label">🔒 Laporan Anonim</p>
-                            </div>
-                        @else
-                            <div class="reporter-info">
-                                <h4 class="reporter-title">🕵️ Identitas Pelapor</h4>
-                                <div class="reporter-grid">
-                                    <div class="reporter-field">
-                                        <span class="reporter-label">Nama</span>
-                                        <span class="reporter-value">{{ $report->reporter_name }}</span>
-                                    </div>
-                                    <div class="reporter-field">
-                                        <span class="reporter-label">Kelas</span>
-                                        <span class="reporter-value">{{ $report->reporter_class }}</span>
-                                    </div>
-                                    <div class="reporter-field">
-                                        <span class="reporter-label">Jurusan</span>
-                                        <span class="reporter-value">{{ $report->reporter_major }}</span>
-                                    </div>
+                        {{-- Reporter Info --}}
+                        <div class="reporter-section">
+                            <h4 class="reporter-title">🕵️ Identitas Pelapor</h4>
+
+                            @if($report->is_anonymous)
+                                <p class="anonymous-info">🔒 Laporan Anonim</p>
+                            @else
+                                <div class="reporter-info">
+                                    @if($report->reporter_name || $report->reporter_class || $report->reporter_major)
+                                        <div class="reporter-grid">
+                                            @if($report->reporter_name)
+                                                <div class="reporter-field">
+                                                    <span class="reporter-label">Nama</span>
+                                                    <span class="reporter-value">{{ $report->reporter_name }}</span>
+                                                </div>
+                                            @endif
+                                            @if($report->reporter_class)
+                                                <div class="reporter-field">
+                                                    <span class="reporter-label">Kelas</span>
+                                                    <span class="reporter-value">{{ $report->reporter_class }}</span>
+                                                </div>
+                                            @endif
+                                            @if($report->reporter_major)
+                                                <div class="reporter-field">
+                                                    <span class="reporter-label">Jurusan</span>
+                                                    <span class="reporter-value">{{ $report->reporter_major }}</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </div>
-                            </div>
-                        @endif
+                            @endif
+                        </div>
                     </div>
                 </div>
             @empty
-                {{-- Tidak ada laporan --}}
                 <div class="empty-state">
                     <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
                     </svg>
-                    <h3 class="empty-title">Belum ada laporan</h3>
-                    <p class="empty-message">Semua masih aman. Tidak ada laporan masuk.</p>
+                    <p class="empty-text">Belum ada laporan yang masuk</p>
                 </div>
             @endforelse
         </div>
     </div>
 
+    {{-- Image Viewer Modal --}}
+    <div id="imageViewer" class="image-viewer">
+        <span class="close-button" onclick="closeImageViewer()">&times;</span>
+        <img id="expandedImage" src="" alt="Expanded image">
+    </div>
+
     <script>
-        function openImageViewer(src) {
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-container">
-                    <button class="close-button" onclick="this.parentElement.parentElement.remove()">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                    <div class="modal-image-container">
-                        <img src="${src}"
-                            class="modal-image"
-                            alt="Full size image">
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+        function openImageViewer(imgSrc) {
+            document.getElementById("imageViewer").style.display = "flex";
+            document.getElementById("expandedImage").src = imgSrc;
+        }
 
-            const img = modal.querySelector('img');
-            let scale = 1;
-
-            // Handle zoom with mouse wheel
-            modal.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                const delta = e.deltaY;
-                if (delta < 0) {
-                    // Zoom in
-                    scale = Math.min(scale + 0.1, 3);
-                } else {
-                    // Zoom out
-                    scale = Math.max(scale - 0.1, 0.5);
-                }
-                img.style.transform = `scale(${scale})`;
-            });
-
-            // Close on background click
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.remove();
-            });
+        function closeImageViewer() {
+            document.getElementById("imageViewer").style.display = "none";
         }
     </script>
 @endsection

@@ -152,40 +152,47 @@
                 <div class="p-6 text-gray-900 dark:text-gray-300">
                     <h3 class="text-lg font-semibold mb-4">Laporan Kamu</h3>
 
-                    <div class="space-y-4">
-                        @forelse(Auth::user()->reports as $report)
-                            <div class="bg-gray-50 dark:bg-[#262626] rounded-lg p-4 hover:shadow-lg transition duration-300">
-                                <div class="flex flex-col space-y-4">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center space-x-2">
-                                            <div class="h-8 w-8 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center">
-                                                <span class="text-white text-sm">{{ substr(Auth::user()->username, 0, 1) }}</span>
+                    {{-- Reports are now loaded in DashboardController --}}
+
+                    @if($reports->isEmpty())
+                        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                            Belum ada laporan yang kamu buat.
+                        </div>
+                    @else
+                        <div class="space-y-4">
+                            @foreach($reports as $report)
+                                <div class="bg-gray-50 dark:bg-[#262626] rounded-lg p-4 hover:shadow-lg transition duration-300">
+                                    <div class="flex flex-col space-y-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="h-8 w-8 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center">
+                                                    <span class="text-white text-sm">{{ substr(Auth::user()->username, 0, 1) }}</span>
+                                                </div>
+                                                <div>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                        {{ $report->created_at->format('d M Y • H:i') }}
+                                                    </span>
+                                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $report->judul }}</h3>
+                                                </div>
                                             </div>
                                             <div>
-                                                <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                    {{ $report->created_at->format('d M Y • H:i') }}
+                                                <span class="px-2 py-1 text-xs rounded {{
+                                                    $report->status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200' :
+                                                    ($report->status === 'proses' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                                                    'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200')
+                                                }}">
+                                                    {{ ucfirst($report->status) }}
                                                 </span>
-                                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $report->judul }}</h3>
                                             </div>
                                         </div>
-                                        <div>
-                                            <span class="px-2 py-1 text-xs rounded {{
-                                                $report->status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200' :
-                                                ($report->status === 'proses' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
-                                                'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200')
-                                            }}">
-                                                {{ ucfirst($report->status) }}
-                                            </span>
+
+                                        <div class="prose dark:prose-invert max-w-none">
+                                            <p class="text-gray-600 dark:text-gray-400">{{ $report->isi_laporan }}</p>
                                         </div>
-                                    </div>
 
-                                    <div class="prose dark:prose-invert max-w-none">
-                                        <p class="text-gray-600 dark:text-gray-400">{{ $report->isi_laporan }}</p>
-                                    </div>
-
-                                    @if($report->image_path)
-                                        <div class="mt-4">
-                                            <div class="relative group cursor-pointer">                                <div class="relative h-[500px] rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700">
+                                        @if($report->image_path)
+                                            <div class="mt-4">
+                                                <div class="relative group cursor-pointer">                                <div class="relative h-[500px] rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700">
                                     <img src="{{ asset('storage/' . $report->image_path) }}"
                                          alt="Bukti laporan"
                                          class="absolute inset-0 w-full h-full object-contain hover:scale-[1.02] transition-transform duration-500"
@@ -205,6 +212,12 @@
                                             </div>
                                         </div>
                                     @endif
+
+                                    <div class="mt-4">
+                                        <a href="{{ route('reports.show', $report->id) }}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                            Lihat Detail
+                                        </a>
+                                    </div>
 
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         <div class="bg-gray-100 dark:bg-[#1e1e1e] p-3 rounded-lg">
@@ -274,13 +287,9 @@
                                         </form>
                                     </div>
                                 </div>
-                            </div>
-                        @empty
-                            <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                                Belum ada laporan
-                            </div>
-                        @endforelse
-                    </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
 

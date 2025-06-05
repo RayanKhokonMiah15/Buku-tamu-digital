@@ -26,16 +26,10 @@ class AdminAuthController extends Controller
             'password' => 'required'   // wajib isi password
         ]);
 
-        // Cari admin berdasarkan username dari input
-        $admin = Admin::where('username', $credentials['username'])->first();
-
-        // Kalau admin ketemu dan password cocok sama yang di-hash di DB
-        if ($admin && Hash::check($credentials['password'], $admin->password)) {
-            // Simpan info login admin di session (kayak bikin status "lagi login")
-            session(['admin_logged_in' => true]);
-
-            // Arahkan ke route dashboard admin
-            return redirect()->route('admin.dashboard');
+        // Attempt to login using admin guard
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         // Kalau login gagal (admin gak ketemu atau password salah),
@@ -46,12 +40,12 @@ class AdminAuthController extends Controller
     }
 
     // Fungsi buat logout admin
-    public function logout()
+    public function logout(Request $request)
     {
-        // Hapus session 'admin_logged_in' biar status login ilang
-        session()->forget('admin_logged_in');
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        // Arahkan balik ke halaman login admin
         return redirect()->route('admin.login');
     }
 }

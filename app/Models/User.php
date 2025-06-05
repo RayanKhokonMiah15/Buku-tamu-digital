@@ -48,6 +48,8 @@ class User extends Authenticatable
 
     public function reports()
     {
-        return $this->hasMany(\App\Models\Report::class);
+        return $this->hasMany(Report::class, 'user_id')
+            ->whereNull('guru_id') // Only get reports created by users, not gurus
+            ->orderByDesc('created_at'); // Show newest reports first
     }
 }
