@@ -50,6 +50,7 @@ php artisan key:generate
 4. Set your DB credentials in `.env`, then run migrations:
 ```bash
 php artisan migrate
+php artisan storage:link
 ```
 
 5. Start the dev server
