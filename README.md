@@ -64,7 +64,7 @@ This project is built for educational and ethical purposes. Contributions and im
 you can contribute with creating a fork and pull request or submit a patch via issue.
 
 <a href="https://github.com/fauzymadani/WhistleBlower/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=fauzymadani/WhistleBlower" />
+  <img src="https://contrib.rocks/image?repo=fauzymadani/WhistleBlower&max=50&columns=10&anon=1" />
 </a>
 
 # License
