@@ -24,54 +24,97 @@
             color: #000000;
         }
 
-        header {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            padding: 1rem 2rem;
-            border-bottom: 1px solid #4b5563;
-            background-color: #111827;
-            transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease;
+        .modern-header {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
         }
 
-        header.light-mode {
-            background-color: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
-            color: #000000;
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .logo-title {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            justify-self: start;
-            transition: color 0.5s ease;
+            gap: 1rem;
         }
 
         .logo-title img {
-            width: 60px;
-            height: 60px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-title img:hover {
+            transform: scale(1.05);
+        }
+
+        .brand-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
         }
 
         nav.navbar {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-            justify-self: center;
-            transition: color 0.5s ease;
+            gap: 1rem;
         }
 
-        nav.navbar a {
-            text-decoration: none;
-            color: #9ca3af;
+        .nav-button {
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
             font-weight: 500;
-            transition: color 0.5s ease;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.95rem;
         }
 
-        nav.navbar a:hover {
-            color: #ffffff;
+        .nav-button {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .login-btn {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .register-btn {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        .login-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .register-btn:hover {
+            background: #2563eb;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         nav.navbar.light-mode a {
@@ -703,27 +746,13 @@
 </head>
 <body>
     <!-- Navbar -->
-    <header>
-        <div class="logo-title">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo">
-            WhistleBlower
+    <header class="modern-header">
+        <div class="header-content">
+            <div class="logo-title">
+                <img src="{{ asset('images/logoptun.png') }}" alt="Logo">
+                <span class="brand-title">Pengadilan Tata Usaha Negara Bandung</span>
+            </div>
         </div>
-        <nav class="navbar">
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            @if (Route::has('login'))
-                @auth
-                    <a href="{{ route('dashboard') }}">Dashboard</a>
-                @else
-                    <a href="{{ route('login') }}">Login</a>
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}">Register</a>
-                    @endif
-                @endauth
-            @endif
-        </nav>
-        <button id="theme-toggle">🌙</button>
-        <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
     </header>
 
     <!-- Mobile Navigation -->
@@ -746,7 +775,8 @@
     <!-- Main Content -->
     <main>
         <div id="home" class="main-text">
-            <h2>Welcome to WhistleBlower 🛡️</h2>
+            <h2>Selamat Datang di</h2>
+            <h2>PTUN Bandung</h2>
             <p class="tagline">Memberdayakan Kebenaran, Melindungi Integritas.</p>
             <div class="description">
                 <p>Platform terpercaya Anda untuk pelaporan rahasia dan transparansi organisasi.</p>
@@ -781,7 +811,7 @@
             </div>
         </div>
         <div id="about" class="image-box">
-            <img src="images/logo.png" alt="WhistleSecure Logo" class="hero-image">
+            <img src="images/logoptun.png" alt="WhistleSecure Logo" class="hero-image">
             <div class="image-overlay"></div>
             <div class="logo-description">
                 <h3>Apa itu WhistleBlower?</h3>
